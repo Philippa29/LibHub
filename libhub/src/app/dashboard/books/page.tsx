@@ -108,7 +108,7 @@ const BookComponent: React.FC = () => {
         style={{ marginBottom: '16px' }}
       />
       <Table dataSource={dummyBooks} columns={columns} />
-      <Modal title="Add Book" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal title="Add Book" open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <Form
           form={form}
           onFinish={onFinish}
@@ -145,7 +145,7 @@ const BookComponent: React.FC = () => {
             </Upload>
           </Form.Item>
           <Form.Item>
-            
+
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
