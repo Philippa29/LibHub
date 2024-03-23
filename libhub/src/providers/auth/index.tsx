@@ -2,11 +2,8 @@ import React, { useReducer, useContext } from "react";
 import authReducer from "./reducer";
 import { AuthStateContext, AuthActionsContext, initialState } from "./context";
 import { message } from 'antd';
-
-interface Credentials {
-  username: string;
-  password: string;
-}
+import { Credentials } from './interface';
+import { useRouter } from "next/navigation";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -14,10 +11,15 @@ interface AuthProviderProps {
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const {push} = useRouter();
 
+  console.log("state", state);
+  console.log("dispatch", dispatch);
   const login = async (credentials: Credentials) => {
     try {
-      const response = await fetch('https://localhost:44311/api/TokenAuth/Authenticate', {
+      console.log("credentials in login: ", credentials); 
+      console.log(process.env["NEXT_PUBLIC_AUTH_URL"], "process.env");
+      const response = await fetch(`${process.env["NEXT_PUBLIC_AUTH_URL"]}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json-patch+json',
@@ -30,16 +32,28 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const result = await response.json();
-      dispatch({ type: 'LOGIN', payload: result.result.accessToken }); // Update state with the received token
-      window.location.href = '/';
+      dispatch({ type: 'LOGIN', payload: result.result.accessToken });
+      localStorage.setItem('authToken', result.result.accessToken); // Update localStorage with the received token
       message.success('Login successful');
     } catch (error) {
-      window.location.href = '/FetchError';
+      
+      message.error('An error occurred while logging in');
     }
+
+    push('/dashboard');
   };
 
   const logout = () => {
-    // Implement logout logic here
+    // Clear the token from localStorage
+    localStorage.removeItem('authToken');
+    if(localStorage.getItem('authToken') === null) {
+    message.success('Logout successful'); 
+    }
+    else
+    {
+      message.error('An error occurred while logging out');
+    }
+   
   };
 
   return (
@@ -51,6 +65,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
+// Define hooks to access Auth state and actions
 const useAuthState = () => {
   const context = useContext(AuthStateContext);
   if (!context) {

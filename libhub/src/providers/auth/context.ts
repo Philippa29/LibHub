@@ -1,4 +1,5 @@
 import { createContext, Context } from 'react';
+import { Credentials } from './interface';
 
 // Define types for context values
 export interface AuthState {
@@ -11,22 +12,23 @@ export interface AuthActions {
   login: (credentials: Credentials) => void;
   logout: () => void;
 }
-
-interface Credentials {
-  username: string;
-  password: string;
-}
-
-// Create contexts with types
-const AuthStateContext: Context<AuthState> = createContext<AuthState>({} as AuthState);
-const AuthActionsContext: Context<AuthActions> = createContext<AuthActions>({} as AuthActions);
-
-// Define initial state
 const initialState: AuthState = {
   isAuthenticated: false,
   authToken: null,
   
 
 };
+
+
+// Create contexts with types
+const AuthStateContext = createContext<AuthState>(initialState);
+const AuthActionsContext = createContext<AuthActions>({
+  login: () => {},
+  logout: () => {}
+});
+
+
+
+
 
 export { AuthActionsContext, AuthStateContext, initialState };

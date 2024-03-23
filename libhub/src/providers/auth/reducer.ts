@@ -1,12 +1,5 @@
-interface AuthState {
-    isAuthenticated: boolean;
-    authToken: string | null;
-  }
-  
-  interface Action {
-    type: string;
-    payload?: string; // Payload is optional, as it's only used for the LOGIN action
-  }
+import { AuthState } from "./interface";
+import { Action } from "./interface";
   
   const initialState: AuthState = {
     isAuthenticated: false,

@@ -132,9 +132,11 @@ const Register = () => {
                 // onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
               />
             </Form.Item>
-            <Form.Item></Form.Item>
+            <Form.Item>
+              <Button onClick = {handleClick}className={styles.loginFormButton}>Register</Button>
+            </Form.Item>
             
-          <Button onClick = {handleClick}className={styles.loginFormButton}>Register</Button>
+          
         </Form>
       </div>
     </div>

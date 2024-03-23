@@ -17,7 +17,7 @@ const BookRequestsChart: React.FC = () => {
   return (
     <div>
       <h2 style={{ marginBottom: '10px' }}>Book Requests per Month</h2>
-      <VictoryChart
+      {/* <VictoryChart
         theme={VictoryTheme.material}
         domainPadding={{ x: 20 }}
         width={200} // Set the width of the chart
@@ -40,7 +40,7 @@ const BookRequestsChart: React.FC = () => {
             labels: { fontSize: 10 }
           }}
         />
-      </VictoryChart>
+      </VictoryChart> */}
     </div>
   );
 };

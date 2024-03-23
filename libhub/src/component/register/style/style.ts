@@ -4,50 +4,62 @@ import { createStyles } from "antd-style";
 export const loginStyles = createStyles(({ css }) => ({
   body: css`
     margin: 0;
-    padding: 0;
-    background-color: #eeee;
-    width: 100%;
-    height: 80%;
+    //background-image: url('/background-geometry.jpg');
+    padding-left: 30vh;
+    // padding-right: 90px;
+    background-color: #EEEE;
+    //width: 100%;
+    height: 100vh;
     display: flex;
     flex-direction: row;
     align-items: center;
   `,
   image: css`
-    background-color: #eeeeee;
+    background-color: #EEEE;
     background-repeat: no-repeat;
+    //border: solid 1px red;
     width: 50%;
-    height: 100vh;
+    height: 50vh;
     position: relative;
     display: flex;
     align-items: center;
     align-content: center;
     justify-content: center;
+    margin-top: 0vh;
   `,
   outerbox: css`
-    background-color: #eeeeee;
-    width: 50%;
-    height: 100vh;
+    background-color: #EEEE;
+    //border: solid 1px blue;
+    width: 30%;
+    height: 50vh;
     position: relative;
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin-top: 5vh;
   `,
   signin: css`
-    margin-top: 20px;
+  text-align : left;
+    margin-top: 30px;
+    //border: solid 1px red;
     color: #2c2738;
   `,
   h1: css`
     font-family: 'Inter', sans-serif;
+    color: black; 
+    
+    
   `,
   p: css`
     font-family: sans-serif;
   `,
   loginForm: css`
-    
+    text-color: black;
+    text-thickness: 2px;
     max-width: 250px;
-    margin: 0 auto;
-    margin-top: 20px;
+    //margin: 0 auto;
+  // margin-top: 20px;
   `,
   loginFormButton: css`
     
