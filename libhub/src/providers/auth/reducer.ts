@@ -20,6 +20,7 @@ import { Action } from "./interface";
           isAuthenticated: false,
           authToken: null,
         };
+      
       default:
         return state;
     }

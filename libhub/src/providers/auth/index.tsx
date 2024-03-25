@@ -2,7 +2,7 @@ import React, { useReducer, useContext } from "react";
 import authReducer from "./reducer";
 import { AuthStateContext, AuthActionsContext, initialState } from "./context";
 import { message } from 'antd';
-import { Credentials } from './interface';
+import { Credentials, RegisterState } from './interface';
 import { useRouter } from "next/navigation";
 
 interface AuthProviderProps {
@@ -13,8 +13,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const {push} = useRouter();
 
-  console.log("state", state);
-  console.log("dispatch", dispatch);
+
   const login = async (credentials: Credentials) => {
     try {
       console.log("credentials in login: ", credentials); 
@@ -43,6 +42,28 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     push('/dashboard');
   };
 
+  // const register = async (regsiter : RegisterState)=> {
+  //   try{
+  //     const response = await fetch(`${process.env["NEXT_PUBLIC_REG_URL"]}`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json-patch+json',
+  //       },
+  //       body: JSON.stringify({ ...regsiter }),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Network response was not ok')
+  //     }
+
+  //     message.success('Registration successful');
+
+  //   }
+  //   catch(error) {
+  //     message.error('An error occurred while registering');
+  //   }
+  // }
+
   const logout = () => {
     // Clear the token from localStorage
     localStorage.removeItem('authToken');
@@ -58,7 +79,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthStateContext.Provider value={{ isAuthenticated: state.isAuthenticated, authToken: state.authToken }}>
-      <AuthActionsContext.Provider value={{ login, logout }}>
+      <AuthActionsContext.Provider value={{ login, logout}}>
         {children}
       </AuthActionsContext.Provider>
     </AuthStateContext.Provider>

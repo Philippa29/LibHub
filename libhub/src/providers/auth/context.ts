@@ -1,23 +1,12 @@
-import { createContext, Context } from 'react';
-import { Credentials } from './interface';
+import { createContext} from 'react';
+import {  AuthState , Register , AuthActions } from './interface';
 
 // Define types for context values
-export interface AuthState {
-  isAuthenticated: boolean;
-  authToken: string | null;
-   
-}
-
-export interface AuthActions {
-  login: (credentials: Credentials) => void;
-  logout: () => void;
-}
 const initialState: AuthState = {
   isAuthenticated: false,
   authToken: null,
-  
-
 };
+
 
 
 // Create contexts with types
@@ -31,4 +20,7 @@ const AuthActionsContext = createContext<AuthActions>({
 
 
 
-export { AuthActionsContext, AuthStateContext, initialState };
+
+
+
+export { AuthActionsContext, AuthStateContext, initialState};

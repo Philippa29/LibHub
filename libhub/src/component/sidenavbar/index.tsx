@@ -23,8 +23,8 @@ interface LinkType {
 
 const links: LinkType[] = [
   { key: "1", label: <Link href="../dashboard/user">User</Link>, icon: <UserOutlined /> },
-  { key: "2", label: <Link href="meetingroom">Meeting Room</Link>, icon: <TeamOutlined /> },
-  { key: "3", label: <Link href="books">Books</Link>,  icon: <FileOutlined /> },
+  { key: "2", label: <Link href="../dashboard/meetingroom">Meeting Room</Link>, icon: <TeamOutlined /> },
+  { key: "3", label: <Link href="../dashboard/books">Books</Link>,  icon: <FileOutlined /> },
   { key: "4", label: <Link href="">Sign Out</Link>, icon: <LogoutOutlined /> },
 ];
 
