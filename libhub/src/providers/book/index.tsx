@@ -31,9 +31,9 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
             formData.append('categoryID', book.categoryID);
             formData.append('bookStatus', book.bookStatus.toString());
             formData.append('bookCondition', book.bookCondition.toString());
-            formData.append('file', book.file);
+            //formData.append('file', book.file);
     
-            const response = await axios.post('https://localhost:44311/api/services/app/CreateBook', formData, {
+            const response = await axios.post('https://localhost:44311/CreateBook', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -44,7 +44,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
             }
     
             message.success('Book added successfully');
-            //router.push('/dashboard');
+           
         } catch (err: any ) {
             if (err.response && err.response.status === 500) {
                 message.error('Internal Server Error: Please try again later');
@@ -54,14 +54,19 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         }
     };
 
+    const getBook = async () => {
+
+    }
+
+
     const getCategory = async () => {
         try {
-             console.log("here");
+             //console.log("here");
             const response = await axios.get('https://localhost:44311/api/services/app/Category/GetAllCategories');
-            console.log(response.data.result);
+            //console.log(response.data.result);
 
             categorydispatch({type: 'GET_CATEGORY' , payload: response.data.result});
-            console.log(categorydispatch); 
+            //console.log(categorydispatch); 
             return response.data.result;
         } catch (err: any) {
             if (err.response && err.response.status === 500) {
@@ -120,4 +125,4 @@ const useCategoryActions = () => {
     return context;
 }
 
-export { BookProvider, useBookState, useBookActions , useCategoryState , useCategoryActions };
+export { BookProvider, useBookState, useBookActions, useCategoryState, useCategoryActions };

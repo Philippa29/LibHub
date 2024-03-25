@@ -5,6 +5,7 @@ import { BookActions, BookState , CategoryState, CategoryActions, Category} from
 
 export const initialState: BookState = {
     title: '',
+    isbn: '',
     author: '',
     publisher: '',
     categoryID: '',
@@ -22,7 +23,7 @@ export const initialCategoryState: CategoryState = {
 export const BookStateContext = createContext<BookState>(initialState);
 export const BookActionsContext = createContext<BookActions>({
     addBook: () => { } , 
-     // Updated parameter name to match function signature
+    
 });
 
 export const CategoryStateContext = createContext<CategoryState>(initialCategoryState);

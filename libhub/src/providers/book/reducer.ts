@@ -2,6 +2,7 @@ import { Action , BookState, CategoryAction, CategoryState} from "./interface";
 
 const  initialState: BookState = {
     title: '',
+    isbn: '',
     author: '',
     publisher: '',
     categoryID: '',
@@ -19,6 +20,7 @@ const addbookreducer = (state: BookState , action: Action) => {
             return {
                 ...state,
               title: action.payload.title,
+              isbn: action.payload.isbn,
               author: action.payload.author,
               publisher: action.payload.publisher,
               categoryID: action.payload.categoryID,
