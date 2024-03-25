@@ -1,31 +1,47 @@
 import { Form, Input, Button } from 'antd';
 import { IdcardOutlined, LockOutlined, PhoneFilled, PhoneOutlined, UserOutlined } from '@ant-design/icons';
-import Image from 'next/image';
-import logo from '../../../public/logo-no-background-libhub.png';
+
 import { loginStyles} from './style/style'; // Import styles
 import { useRouter } from 'next/navigation';
-import {Register} from '@/providers/register/interface';
+//import {Register} from '@/providers/register/interface';
 import { useState } from 'react';
 import { message } from 'antd';
 import { useRegisterActions } from '@/providers/register';
 import { Modal } from 'antd';
 
-const handleLogin = () => {
-  // Implement login functionality here
-};
-interface RegisterProps {
-  onClose: () => void; // Define the onFinish prop
+
+interface RegisterCredentials {
+  name: string;
+  surname: string;
+  emailAddress: string;
+  phoneNumber: string;
+  password: string;
+  studentID: string;
 }
-const Register : React.FC<RegisterProps> = ({ onClose }) => {
+
+
+interface RegisterProps {
+  onClose?: () => void; // Define the onFinish prop
+  open: boolean;
+}
+
+
+
+const Register : React.FC<RegisterProps> = ({ onClose,open }) => {
   const { registeruser } = useRegisterActions();
   const router = useRouter();
-  const [credentials, setCredentials] = useState<Register>({ name: '', surname: '', emailAddress: '', phoneNumber: '', password: '', studentID: '' });
   
+  const[form]=Form.useForm();
+  const [registerCredentials, setRegisterCredentials] = useState<RegisterCredentials>({ name: '', surname: '', emailAddress: '', phoneNumber: '', password: '', studentID: '' });
+//const [isModalVisible, setIsModalVisible] = useState(false);
+
+
+
 
   const onFinish = async () => { 
-    console.log('credentials: ', credentials);
+    console.log('credentials: ', registerCredentials);
     try {
-      await registeruser(credentials);
+      await registeruser(registerCredentials);
       message.success('Registration successful');
       router.push('/login');
     } catch (error) {
@@ -33,32 +49,111 @@ const Register : React.FC<RegisterProps> = ({ onClose }) => {
     }
   };
 
-  const {styles}= loginStyles();
+  
   return (
     <>
-    <Button type="primary">Register</Button>
-    <Modal title="Register" footer={null}>
-      <Form name="register" onFinish={onFinish} initialValues={{ remember: true }}>
-        <Form.Item name="name" rules={[{ required: true, message: 'Please input your name!' }]}>
-          <Input prefix={<UserOutlined />} placeholder="Name" onChange={(e) => setCredentials({ ...credentials, name: e.target.value })} />
-        </Form.Item>
-        <Form.Item name="email" rules={[{ required: true, message: 'Please input your email!' }]}>
-          <Input prefix={<UserOutlined />} placeholder="Email" onChange={(e) => setCredentials({ ...credentials, emailAddress: e.target.value })} />
-        </Form.Item>
-        <Form.Item name="password" rules={[{ required: true, message: 'Please input your password!' }]}>
-          <Input.Password prefix={<LockOutlined />} placeholder="Password" onChange={(e) => setCredentials({ ...credentials, password: e.target.value })} />
-        </Form.Item>
-        <Form.Item name="studentID" rules={[{ required: true, message: 'Please input your student ID!' }]}>
-          <Input prefix={<IdcardOutlined />} placeholder="Student ID" onChange={(e) => setCredentials({ ...credentials, studentID: e.target.value })} />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" style={{ marginRight: '10px' }}>
-            Register
-          </Button>
-          <Button htmlType="button">Cancel</Button>
-        </Form.Item>
-      </Form>
-    </Modal>
+    <Modal
+          title="Register"
+          open={open}
+          onCancel={onClose}
+          onOk={form.submit}
+          okText='Register'
+          cancelButtonProps={{danger: true}}
+          okButtonProps={{type: 'primary'}}
+        >
+          <Form name="register" form={form}  onFinish={onFinish} initialValues={{ remember: true }}>
+            <Form.Item
+              name="name"
+              rules={[{ required: true, message: 'Please input your name!' }]}
+            >
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Name"
+                onChange={(e) =>
+                  setRegisterCredentials({ ...registerCredentials, name: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="surname"
+              rules={[{ required: true, message: 'Please input your surname!' }]}
+            >
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Surname"
+                onChange={(e) =>
+                  setRegisterCredentials({ ...registerCredentials, surname: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="studentID"
+              rules={[
+                { required: true, message: 'Please input your student ID!' },
+                {
+                  len: 8,
+                  message: 'Student ID must be exactly 8 characters long',
+                },
+                {
+                  pattern: /^[0-9]+$/,
+                  message: 'Student ID must contain only numbers',
+                },
+              ]}
+            >
+              <Input
+                prefix={<IdcardOutlined />}
+                placeholder="Student ID"
+                onChange={(e) =>
+                  setRegisterCredentials({ ...registerCredentials, studentID: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="phoneNumber"
+              rules={[{ required: true, message: 'Please input your phone number!' }]}
+            >
+              <Input
+                prefix={<PhoneOutlined />}
+                placeholder="Phone Number"
+                onChange={(e) =>
+                  setRegisterCredentials({ ...registerCredentials, phoneNumber: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: 'Please input your email!' },
+                { type: 'email', message: 'Please input a valid email address!' },
+              ]}
+            >
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Email"
+                onChange={(e) =>
+                  setRegisterCredentials({ ...registerCredentials, emailAddress: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name="password"
+              rules={[
+                { required: true, message: 'Please input your password!' },
+                { min: 6, message: 'Password must be at least 6 characters long' },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Password"
+                onChange={(e) =>
+                  setRegisterCredentials({ ...registerCredentials, password: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item>
+            </Form.Item>
+          </Form>
+        </Modal>
   </>
   );
 };
@@ -66,126 +161,4 @@ const Register : React.FC<RegisterProps> = ({ onClose }) => {
 export default Register;
 
 
-    // <div className={styles.body}>
-    //   <div className={styles.image}>
-    //   <Image src={logo} alt="logo" />
-    //   </div>
-    //   <div className={styles.outerbox}>
-    //     <div className={styles.signin}>
-    //       <h1 className={styles.h1}>Register</h1>
-    //       {/* Other content */}
-    //     </div>
-        
-    //     <Form
-    //         name="normal_login"
-    //         className={styles.loginForm}
-    //         initialValues={{
-    //           remember: true,
-    //         }}
-    //         onFinish={onFinish} // Handle form submission
-    //       >
-    //         <Form.Item
-    //           name="Name"
-    //           rules={[
-    //             {
-    //               required: true,
-    //               message: 'Please input your Name!',
-    //             },
-    //           ]}
-    //         >
-    //           <Input
-    //             id='Name'
-    //             prefix={<UserOutlined className="site-form-item-icon" />}
-    //             placeholder="Name"
-    //             onChange={(e) => setCredentials({ ...credentials, name: e.target.value})}
-    //           />
-    //         </Form.Item>
-    //         <Form.Item
-    //           name="Surname"
-    //           rules={[
-    //             {
-    //               required: true,
-    //               message: 'Please input your Name!',
-    //             },
-    //           ]}
-    //         >
-    //           <Input
-    //             id='Surname'
-    //             prefix={<UserOutlined className="site-form-item-icon" />}
-    //             placeholder="Surname"
-    //             onChange={(e) => setCredentials({ ...credentials, surname: e.target.value})}
-    //           />
-    //         </Form.Item>
-    //         <Form.Item
-    //           name="Phone"
-    //           rules={[
-    //             {
-    //               required: true,
-    //               message: 'Please input your Name!',
-    //             },
-    //           ]}
-    //         >
-    //           <Input
-    //             id='Phone'
-    //             prefix={<PhoneOutlined className="site-form-item-icon" />}
-    //             placeholder="Phone Number"
-    //             onChange={(e) => setCredentials({ ...credentials, phoneNumber: e.target.value })}
-    //           />
-    //         </Form.Item>
-    //         <Form.Item
-    //           name="username"
-    //           rules={[
-    //             {
-    //               required: true,
-    //               message: 'Please input your Username!',
-    //             },
-    //           ]}
-    //         >
-    //           <Input
-    //             id='email'
-    //             prefix={<UserOutlined className="site-form-item-icon" />}
-    //             placeholder="Email"
-    //             onChange={(e) => setCredentials({ ...credentials, emailAddress: e.target.value})}
-    //           />
-    //         </Form.Item>
-
-    //         <Form.Item
-    //           name="Student Number"
-    //           rules={[
-    //             {
-    //               required: true,
-    //               message: 'Please input your Student Number!',
-    //             },
-    //           ]}
-    //         >
-    //           <Input
-    //             prefix={<IdcardOutlined className="site-form-item-icon" />}
-    //             type="Student Number"
-    //             placeholder="Student Number"
-    //             onChange={(e) => setCredentials({ ...credentials, studentID: e.target.value })}
-    //           />
-    //         </Form.Item>
-    //         <Form.Item
-    //           name="password"
-    //           rules={[
-    //             {
-    //               required: true,
-    //               message: 'Please input your Password!',
-    //             },
-    //           ]}
-    //         >
-    //           <Input
-    //             prefix={<LockOutlined className="site-form-item-icon" />}
-    //             type="password"
-    //             placeholder="Password"
-    //             onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-    //           />
-    //         </Form.Item>
-    //         <Form.Item>
-    //           <Button type="primary" htmlType="submit" className={styles.loginFormButton}>Register</Button>
-    //         </Form.Item>
-            
-          
-    //     </Form>
-    //   </div>
-    // </div>
+ 

@@ -1,7 +1,8 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, Table, Space, Modal, Form, Button, Upload, Select } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { useCategoryActions } from '@/providers/book';
 
 interface Book {
   name: string;
@@ -32,25 +33,69 @@ const dummyBooks: Book[] = [
 ];
 
 const BookComponent: React.FC = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [searchValue, setSearchValue] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null); // Add this line
+  const {getCategory} = useCategoryActions();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategory();
+        console.log('response:', response); // Log the entire response for debugging
+        if (response && Array.isArray(response)) {
+          
+          setCategories(response.map((category: { id: string; name: string }) => ({ id: category.id, name: category.name })));
+        } else {
+          console.error('Invalid response format:', response);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        // Handle error state or display an error message to the user
+      }
+    };
+  
+    fetchCategories();
+  }, [getCategory]);
+  
+  
+  
+  interface Category {
+    id: string;
+    name: string;
+  }
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    form.setFieldsValue({ categoryID: undefined }); // Reset category field value in the form
+  };
+  
   const showModal = () => {
     setIsModalVisible(true);
+    form.setFieldsValue({ categoryID: undefined }); // Reset category field value in the form
   };
+  
 
   const handleOk = () => {
     form.submit();
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+
+
+  const handleCategoryChange = async () => {
+    try {
+      const result = await getCategory();
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const onFinish = (values: any) => {
     const { name, isbn, author, publisher, status, bookCondition, bookStatus } = values;
-    dummyBooks.push({ name, isbn, author, publisher, status, bookCondition, bookStatus });
+    // Here you would typically submit the form data to your backend or update your state accordingly
     setIsModalVisible(false);
   };
 
@@ -125,7 +170,15 @@ const BookComponent: React.FC = () => {
           <Form.Item name="publisher" label="Publisher" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-
+          <Form.Item name="categoryID" label="Category" rules={[{ required: true }]}>
+            <Select onChange={handleCategoryChange} value={selectedCategory ? selectedCategory.id : undefined}>
+              {categories.map(category => (
+                <Select.Option key={category.id} value={category.id}>
+                  {category.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>  
           <Form.Item name="bookCondition" label="Book Condition" rules={[{ required: true }]}>
             <Select>
               <Select.Option value={BookCondition.Lost}>Lost</Select.Option>
@@ -143,9 +196,6 @@ const BookComponent: React.FC = () => {
             <Upload>
               <Button icon={<UploadOutlined />}>Click to Upload</Button>
             </Upload>
-          </Form.Item>
-          <Form.Item>
-
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">

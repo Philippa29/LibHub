@@ -2,8 +2,9 @@ import React, { useReducer, useContext } from "react";
 import authReducer from "./reducer";
 import { AuthStateContext, AuthActionsContext, initialState } from "./context";
 import { message } from 'antd';
-import { Credentials, RegisterState } from './interface';
+import { Credentials } from './interface';
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -15,54 +16,46 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   const login = async (credentials: Credentials) => {
+    console.log("here"); 
     try {
-      console.log("credentials in login: ", credentials); 
-      console.log(process.env["NEXT_PUBLIC_AUTH_URL"], "process.env");
-      const response = await fetch(`${process.env["NEXT_PUBLIC_AUTH_URL"]}`, {
-        method: 'POST',
+      console.log("here inside ", credentials); 
+      const response = await axios.post(`${process.env["NEXT_PUBLIC_AUTH_URL"]}`, credentials, {
         headers: {
-          'Content-Type': 'application/json-patch+json',
-        },
-        body: JSON.stringify({ ...credentials }),
+          'Content-Type': 'application/json-patch+json'
+        }
       });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
+      console.log("response", response.data)
+      if (response.status === 200) { // Fixed conditional statement
+        console.log(response.data.result.accessToken);
+        dispatch({ type: 'LOGIN', payload: response.data.result.accessToken });
+        localStorage.setItem('authToken', response.data.result.accessToken);
+        message.success('Login successful');
+        push('/dashboard');
+      } else {
+        throw new Error('Network response was not ok');
       }
 
-      const result = await response.json();
-      dispatch({ type: 'LOGIN', payload: result.result.accessToken });
-      localStorage.setItem('authToken', result.result.accessToken); // Update localStorage with the received token
-      message.success('Login successful');
-    } catch (error) {
-      
-      message.error('An error occurred while logging in');
+      //const result = await response.json();
+
+
+             if (!response.data.ok) {
+        throw new Error('Network response was not ok')
+      }
+    } 
+    catch (err) {
+      console.error("Login error:", err); 
+      if ((err as any).response && (err as any).response.status === 500) {
+        // Internal server error occurred
+        message.error('Internal server error. Please try again later.');
+      } else {
+        // Other error occurred
+        message.error('An error occurred while logging in');
+      }
     }
 
-    push('/dashboard');
+   
   };
 
-  // const register = async (regsiter : RegisterState)=> {
-  //   try{
-  //     const response = await fetch(`${process.env["NEXT_PUBLIC_REG_URL"]}`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json-patch+json',
-  //       },
-  //       body: JSON.stringify({ ...regsiter }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Network response was not ok')
-  //     }
-
-  //     message.success('Registration successful');
-
-  //   }
-  //   catch(error) {
-  //     message.error('An error occurred while registering');
-  //   }
-  // }
 
   const logout = () => {
     // Clear the token from localStorage

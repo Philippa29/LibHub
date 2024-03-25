@@ -1,3 +1,4 @@
+import { BookProvider } from "@/providers/book/index";
 import dynamic from "next/dynamic"; 
 export const metadata = {
   title: 'Libhub',
@@ -12,8 +13,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
+    <BookProvider>
+      
+    
     <html lang="en">
       <body style = {{margin: 0 }}>{children}</body>
     </html>
+    </BookProvider>
   )
 }

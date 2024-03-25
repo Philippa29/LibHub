@@ -1,6 +1,6 @@
 import React, { useReducer, useContext } from "react";
 import authReducer from "./reducer";
-import { RegsiterActionsContext , RegsiterStateContext, initialState } from "./context";
+import {  RegsiterActionsContext, RegsiterStateContext, initialState } from "./context";
 import { message } from 'antd';
 import { Register, RegisterState } from './interface';
 import { useRouter } from "next/navigation";

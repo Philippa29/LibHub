@@ -9,7 +9,7 @@ import { useAuthActions } from '@/providers/auth';
 import { message , Modal} from 'antd';
 import { useRegisterActions } from '@/providers/register';
 import Register from '../register/register'; // Import the Register component
-import Link from 'next/link';
+
 interface Credentials {
   userNameOrEmailAddress: string;
   password: string;
@@ -30,6 +30,7 @@ const Login = () => {
   const [credentials, setCredentials] = useState<Credentials>({ userNameOrEmailAddress: '', password: '' });
   const [registerCredentials, setRegisterCredentials] = useState<RegisterCredentials>({ name: '', surname: '', emailAddress: '', phoneNumber: '', password: '', studentID: '' });
   const router = useRouter();
+  const[form]=Form.useForm();
   const { registeruser } = useRegisterActions();
   const { styles } = loginStyles();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,6 +43,7 @@ const Login = () => {
 
   // Function to handle closing the registration modal
   const handleCloseRegistrationModal = () => {
+    console.log('close');
     setIsModalVisible(false);
   };
 
@@ -61,24 +63,13 @@ const Login = () => {
     } catch (error) {
       message.error('An error occurred while logging in');
     }
-    router.push('/dashboard'); 
-  };
-
-  const onFinishRegister = async () => {
-    console.log('credentials: ', credentials);
-    try {
-      await registeruser(registerCredentials);
-      message.success('Registration successful');
-      router.push('/login');
-    } catch (error) {
-      message.error('An error occurred while registering');
-    }
+    //router.push('/dashboard'); 
   };
 
 
-  const handleRegister = () => {
-    setIsModalOpen(true);
-  };
+
+
+
 
   return (
     <div className={styles.body}>
@@ -108,7 +99,7 @@ const Login = () => {
           >
             <Input
               prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="Email"
+              placeholder="Username"
               onChange={(e) => setCredentials({ ...credentials, userNameOrEmailAddress: e.target.value })}
             />
           </Form.Item>
@@ -137,111 +128,11 @@ const Login = () => {
           <span style={{ cursor: 'pointer', color: 'blue' }} onClick={handleOpenRegistrationModal}>
           Register
         </span>
-        <Modal
-          title="Register"
-          open={isModalVisible}
-          onCancel={handleCloseRegistrationModal}
-          footer={null}
-        >
-          <Form name="register" onFinish={onFinishRegister} initialValues={{ remember: true }}>
-            <Form.Item
-              name="name"
-              rules={[{ required: true, message: 'Please input your name!' }]}
-            >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Name"
-                onChange={(e) =>
-                  setRegisterCredentials({ ...registerCredentials, name: e.target.value })
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              name="surname"
-              rules={[{ required: true, message: 'Please input your surname!' }]}
-            >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Surname"
-                onChange={(e) =>
-                  setRegisterCredentials({ ...registerCredentials, surname: e.target.value })
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              name="studentID"
-              rules={[
-                { required: true, message: 'Please input your student ID!' },
-                {
-                  len: 8,
-                  message: 'Student ID must be exactly 8 characters long',
-                },
-                {
-                  pattern: /^[0-9]+$/,
-                  message: 'Student ID must contain only numbers',
-                },
-              ]}
-            >
-              <Input
-                prefix={<IdcardOutlined />}
-                placeholder="Student ID"
-                onChange={(e) =>
-                  setRegisterCredentials({ ...registerCredentials, studentID: e.target.value })
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              name="phoneNumber"
-              rules={[{ required: true, message: 'Please input your phone number!' }]}
-            >
-              <Input
-                prefix={<PhoneOutlined />}
-                placeholder="Phone Number"
-                onChange={(e) =>
-                  setRegisterCredentials({ ...registerCredentials, phoneNumber: e.target.value })
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              name="email"
-              rules={[
-                { required: true, message: 'Please input your email!' },
-                { type: 'email', message: 'Please input a valid email address!' },
-              ]}
-            >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Email"
-                onChange={(e) =>
-                  setRegisterCredentials({ ...registerCredentials, emailAddress: e.target.value })
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              rules={[
-                { required: true, message: 'Please input your password!' },
-                { min: 6, message: 'Password must be at least 6 characters long' },
-              ]}
-            >
-              <Input.Password
-                prefix={<LockOutlined />}
-                placeholder="Password"
-                onChange={(e) =>
-                  setRegisterCredentials({ ...registerCredentials, password: e.target.value })
-                }
-              />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" style={{ marginRight: '10px' }}>
-                Register
-              </Button>
-              <Button htmlType="button" onClick={handleCloseRegistrationModal}>
-                Cancel
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
+
+          <Register onClose={handleCloseRegistrationModal} open={isModalVisible} />
+
+   
+       
       
       </div>
     </div>

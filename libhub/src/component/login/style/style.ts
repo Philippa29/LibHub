@@ -45,9 +45,9 @@ export const loginStyles = createStyles(({ css }) => ({
   `,
   loginForm: css`
     
-    max-width: 250px;
-    margin: 0 auto;
-    margin-top: 20px;
+     width: 500px;
+     margin: 0 auto;
+     margin-top: 20px;
   `,
   loginFormButton: css`
     

@@ -1,14 +1,14 @@
 import { RegisterState } from "./interface";
 import { Action } from "./interface";
   
-  const initialState: RegisterState = {
-    name: '',
-    surname: '',
-    emailAddress: '',
-    phoneNumber: '',
-    password: '',
-    studentID: '',
-  };
+  // const initialState: RegisterState = {
+  //   name: '',
+  //   surname: '',
+  //   emailAddress: '',
+  //   phoneNumber: '',
+  //   password: '',
+  //   studentID: '',
+  // };
   
   const registerReducer = (state: RegisterState, action: Action): RegisterState => {
     console.log("action", action);
