@@ -19,21 +19,14 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
     // const [category, setCategory] = useState<Category>();
     const { push } = useRouter();
     const [categoryid , setCategoryID] = React.useState<string>(''); 
-    const addBook = async (book : Book) => {
+    const addBook = async (book : FormData) => {
         //the end point of getallcategors the id and name of the catgory is there
 
 
         try {
-            const formData = new FormData();
-            formData.append('title', book.title);
-            formData.append('author', book.author);
-            formData.append('publisher', book.publisher);
-            formData.append('categoryID', book.categoryID);
-            formData.append('bookStatus', book.bookStatus.toString());
-            formData.append('bookCondition', book.bookCondition.toString());
-            //formData.append('file', book.file);
+
     
-            const response = await axios.post('https://localhost:44311/CreateBook', formData, {
+            const response = await axios.post('https://localhost:44311/CreateBook', book, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -54,9 +47,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         }
     };
 
-    const getBook = async () => {
-
-    }
+    
 
 
     const getCategory = async () => {

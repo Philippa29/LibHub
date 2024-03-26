@@ -5,6 +5,7 @@ import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined 
 import { useCategoryActions, useBookActions } from '@/providers/book';
 import { message } from 'antd';
 import { Book } from '@/providers/book/interface';
+import axios from 'axios';
 
 
 
@@ -92,12 +93,26 @@ const BookComponent: React.FC = () => {
 
 
 
-  const onFinish = async () => {
+  const onFinish = async (values: any) => {
 
-      console.log('book:', book);
+      console.log('values:', values);
+
+      const formData = new FormData();
+      //book.categoryID = "1E27D26D-8EF9-411D-94E9-08DC4A40801A";
+      formData.append('title', values?.title);
+      formData.append('author', values?.author);
+      formData.append('publisher', values?.publisher);
+      formData.append('categoryID', values?.categoryID);
+      formData.append('isbn', values?.isbn);
+      formData.append('bookStatus', values?.bookStatus.toString());
+      formData.append('bookCondition', values?.bookCondition.toString());
+      formData.append('file', values?.image.file.originFileObj );
+
+      console.log('formdata:', formData);
+
 
       try {
-        const response = await addBook(book);
+        const response = await addBook(formData);
         console.log('response for addbook:', response); // Log the entire response for debugging
         
           message.success('Book added successfully');
@@ -166,6 +181,8 @@ const BookComponent: React.FC = () => {
     },
   ];
 
+
+
   return (
     <div>
       <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
@@ -191,7 +208,7 @@ const BookComponent: React.FC = () => {
           form={form}
           onFinish={onFinish}
         >
-         <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+         <Form.Item name="title" label="Title" rules={[{ required: true }]}>
           <Input onChange={(e) => setBook({ ...book, title: e.target.value })} />
         </Form.Item>
         <Form.Item name="isbn" label="ISBN" rules={[{ required: true }]}>
@@ -227,48 +244,49 @@ const BookComponent: React.FC = () => {
     </Form.Item>
         <Form.Item name="image" label="Upload Image">
         <Upload
-  fileList={
-    book.file
-      ? [
-          {
-            uid: '-1',
-            name: book.file.name, // Provide the file name as a string
-            status: 'done', // Assuming the file is already uploaded
-            url: `data:image/png;base64,${book.file.base64String}`, // Assuming the base64 string is stored in 'base64String'
-          },
-        ]
-      : []
-  }
+        
+  // fileList={
+  //   book.file
+  //     ? [
+  //         {
+  //           uid: '-1',
+  //           name: book.file.name, // Provide the file name as a string
+  //           status: 'done', // Assuming the file is already uploaded
+  //           url: `data:image/png;base64,${book.file.base64String}`, // Assuming the base64 string is stored in 'base64String'
+  //         },
+  //       ]
+  //     : []
+  // }
   
-  onChange={async (info) => {
-    console.log('info:', info);
-    if (info.file.status === 'uploading') {
-      const file = info.file.originFileObj as File; // Get the uploaded file
-      try {
-        console.log('here in file file:', file);
-        const base64String = await getBase64(file);
-        console.log(base64String)
-         console.log('name', file.name) 
-         console.log('type', file.type)// Convert the file to base64
-         setBook(prevBook => ({
-          ...prevBook,
-          file: { base64String, name: file.name, type: file.type },
-        }));
-         // Update the book state with the base64 string
-      } catch (error) {
-        console.error('Error converting file to base64:', error);
-      }
-    }
-    else if (info.file.status === 'removed') {
-      setBook(prevBook => ({
-        ...prevBook,
-        file: undefined, // Clear the file from the state
-      }));
-    }
-  }}
+  // onChange={async (info) => {
+  //   console.log('info:', info);
+    
+  //     const file = info.file.originFileObj as File; // Get the uploaded file
+  //     try {
+  //       console.log('here in file file:', file);
+  //       const base64String = await getBase64(file);
+  //       console.log(base64String)
+  //        console.log('name', file.name) 
+  //        console.log('type', file.type)// Convert the file to base64
+  //        setBook(prevBook => ({
+  //         ...prevBook,
+  //         file: { base64String, name: file.name, type: file.type },
+  //       }));
+  //        // Update the book state with the base64 string
+  //     } catch (error) {
+  //       console.error('Error converting file to base64:', error);
+  //     }
+    
+  //   if (info.file.status === 'removed') {
+  //     setBook(prevBook => ({
+  //       ...prevBook,
+  //       file: undefined, // Clear the file from the state
+  //     }));
+  //   }
+  // }}
   showUploadList={true}
 >
-  <Button icon={<UploadOutlined />}>Click to Upload</Button>
+  <Button icon={<UploadOutlined />}>Click to Upload (Max:1) </Button>
 </Upload>
 
 
