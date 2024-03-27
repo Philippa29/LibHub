@@ -1,5 +1,5 @@
 import { createContext} from 'react';
-import {  AuthState , Register , AuthActions } from './interface';
+import {  AuthState , AuthActions, Credentials } from './interface';
 
 // Define types for context values
 const initialState: AuthState = {

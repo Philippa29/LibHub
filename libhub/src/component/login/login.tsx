@@ -28,12 +28,11 @@ const Login = () => {
   let authToken : string| null;
   const { login } = useAuthActions();
   const [credentials, setCredentials] = useState<Credentials>({ userNameOrEmailAddress: '', password: '' });
-  const [registerCredentials, setRegisterCredentials] = useState<RegisterCredentials>({ name: '', surname: '', emailAddress: '', phoneNumber: '', password: '', studentID: '' });
   const router = useRouter();
   const[form]=Form.useForm();
-  const { registeruser } = useRegisterActions();
+
   const { styles } = loginStyles();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 

@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { BookActions, BookState , CategoryState, CategoryActions, Category} from "./interface";
+import { BookActions, BookState , CategoryState, CategoryActions, Category, Book} from "./interface";
 
 // Define types for context values
 
@@ -23,7 +23,7 @@ export const initialCategoryState: CategoryState = {
 export const BookStateContext = createContext<BookState>(initialState);
 export const BookActionsContext = createContext<BookActions>({
     addBook: () => { } , 
-    
+    getBook: async () => [] as Book[], 
 });
 
 export const CategoryStateContext = createContext<CategoryState>(initialCategoryState);

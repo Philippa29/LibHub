@@ -1,6 +1,5 @@
 import { Form, Input, Button } from 'antd';
 import { IdcardOutlined, LockOutlined, PhoneFilled, PhoneOutlined, UserOutlined } from '@ant-design/icons';
-
 import { loginStyles} from './style/style'; // Import styles
 import { useRouter } from 'next/navigation';
 //import {Register} from '@/providers/register/interface';

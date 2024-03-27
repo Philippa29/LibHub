@@ -15,10 +15,13 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
     
     const [state, dispatch] = useReducer(addbookreducer, initialState);
     const [categorystate , categorydispatch] = useReducer(categoryreducer, initialCategoryState);
+    const [allBooksState , allBooksDispatch] = useReducer(addbookreducer, initialState);
     const categoryState = useCategoryState();
     // const [category, setCategory] = useState<Category>();
     const { push } = useRouter();
     const [categoryid , setCategoryID] = React.useState<string>(''); 
+
+
     const addBook = async (book : FormData) => {
         //the end point of getallcategors the id and name of the catgory is there
 
@@ -46,6 +49,20 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
             }
         }
     };
+
+
+    const getBook = async () => {
+        try {
+            const response = await axios.get('https://localhost:44311/api/services/app/Book/GetAllBooks');
+    
+            // Handle the response data here, such as updating state or performing other actions
+            console.log(response.data);
+        } catch (error) {
+            // Handle errors here
+            console.error('Error fetching books:', error);
+        }
+    }
+    
 
     
 
@@ -75,7 +92,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         <CategoryActionsContext.Provider value={{ getCategory }}>
        
         <BookStateContext.Provider value={state } >
-            <BookActionsContext.Provider value={{addBook }}>
+            <BookActionsContext.Provider value={{addBook , getBook}}>
                 {children}
             </BookActionsContext.Provider>
         </BookStateContext.Provider> 

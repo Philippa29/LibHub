@@ -85,6 +85,7 @@ export interface CategoryState {
   
   export interface BookActions {
     addBook: (Book: FormData) => void;
+    getBook: () => void; 
   }
 
   export interface CategoryActions {

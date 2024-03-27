@@ -28,6 +28,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.status === 200) { // Fixed conditional statement
         console.log(response.data.result.accessToken);
         dispatch({ type: 'LOGIN', payload: response.data.result.accessToken });
+        console.log('state:', state.authToken);
         localStorage.setItem('authToken', response.data.result.accessToken);
         message.success('Login successful');
         push('/dashboard');

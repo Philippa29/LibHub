@@ -12,6 +12,7 @@ interface RegisterProviderProps {
 
 const RegisterProvider: React.FC<RegisterProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState );
+  console.log('state:',  state); 
   const {push} = useRouter();
 
 

@@ -39,6 +39,23 @@ const addbookreducer = (state: BookState , action: Action) => {
             };
         }
         return state;
+
+    case 'GET_BOOK':
+        if (action.payload) {
+            return {
+                ...state,
+                title: action.payload.title,
+                isbn: action.payload.isbn,
+              author: action.payload.author,
+              publisher: action.payload.publisher,
+              categoryID: action.payload.categoryID,
+              bookStatus: action.payload.bookStatus,
+              bookCondition: action.payload.bookCondition,
+              file: action.payload.file,
+            }
+        } 
+        return state;
+
     
 
         default:
