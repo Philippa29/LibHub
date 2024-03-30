@@ -1,7 +1,7 @@
 'use client'
 import React, { useContext, useReducer } from 'react';
 import { Book, Category } from './interface';
-import {addbookreducer, categoryreducer} from './reducer';
+import {addbookreducer, categoryreducer, getallbooksreducer} from './reducer';
 import { message } from 'antd';
 import { useRouter } from 'next/navigation';
 import { BookActionsContext, CategoryActionsContext, CategoryStateContext, initialCategoryState, initialState } from './context';
@@ -14,8 +14,9 @@ interface BookProviderProps {
 const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
     
     const [state, dispatch] = useReducer(addbookreducer, initialState);
+    const [allbooksstate , dispatchallbooks] = useReducer(getallbooksreducer, []);
     const [categorystate , categorydispatch] = useReducer(categoryreducer, initialCategoryState);
-    const [allBooksState , allBooksDispatch] = useReducer(addbookreducer, initialState);
+    //const [allBooksState , allBooksDispatch] = useReducer(addbookreducer, initialState);
     const categoryState = useCategoryState();
     // const [category, setCategory] = useState<Category>();
     const { push } = useRouter();
@@ -57,6 +58,8 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
     
             // Handle the response data here, such as updating state or performing other actions
             console.log(response.data);
+            dispatchallbooks({type: 'GET_ALL_BOOKS', payload: response.data.result});
+            return response.data.result;
         } catch (error) {
             // Handle errors here
             console.error('Error fetching books:', error);

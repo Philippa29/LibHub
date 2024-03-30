@@ -27,15 +27,30 @@ const BookComponent: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [allbooks , setallbooks ] = useState<Book[]>([]); // Add this line
   const [searchValue, setSearchValue] = useState('');
-  //const [selectedCategory, setSelectedCategory] = useState<Category | null>(null); // Add this line
+  
   const {getCategory} = useCategoryActions();
- 
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [selectedBookForEdit, setSelectedBookForEdit] = useState<Book | null>(null);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false); // State for Add modal
+
   const {addBook, getBook} = useBookActions();
-  //const [formData, setFormData] = useState<Book>();
+  
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [deleteBook, setDeleteBook] = useState<Book | null>(null);
+  
+  const showDeleteModal = (book: Book) => {
+    setDeleteBook(book);
+    setIsDeleteModalVisible(true);
+  };
 
+  const hideDeleteModal = () => {
+    setIsDeleteModalVisible(false);
+  };
+  
   const [book, setBook] = useState<Book>({
+    id: '',
     title: '',
     isbn: '',
     author: '',
@@ -61,22 +76,32 @@ const BookComponent: React.FC = () => {
         console.error('Error fetching categories:', error);
         // Handle error state or display an error message to the user
       }
-      const fetchBooks = async () => {
-        try {
-          const response = await getBook();
-          if (response && Array.isArray(response)) {
-            setAllBooks(response);
-          } else {
-            console.error('Invalid response format:', response);
-          }
-        } catch (error) {
-          console.error('Error fetching books:', error);
-        }
-      };
-    };
+    }
   
     fetchCategories();
-  }, [getCategory, fetchBooks]);
+
+    
+    
+  }, []);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const response = await getBook();
+        console.log('response:', response);
+        // Log the entire response for debugging
+        if (response && Array.isArray(response)) {
+          setallbooks(response);
+        } else {
+          console.error('Invalid response format:', response);
+        }
+      } catch (error) {
+        console.error('Error fetching books:', error);
+      }
+    };
+  
+    fetchBooks();
+  }, []);
   
   
   
@@ -87,7 +112,9 @@ const BookComponent: React.FC = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    form.setFieldsValue({ categoryID: undefined }); // Reset category field value in the form
+    form.resetFields();
+    setSelectedBookForEdit(null) // Reset category field value in the form
+    console.log('selectedBookForEdit in cancel:', selectedBookForEdit);
   };
   
   const showModal = () => {
@@ -105,8 +132,6 @@ const BookComponent: React.FC = () => {
     return true; // Allow uploading
   };
   
-  const GetAllBooks = async () => {
-  }
 
 
 
@@ -128,37 +153,28 @@ const BookComponent: React.FC = () => {
       console.log('formdata:', formData);
 
 
-      try {
-        const response = await addBook(formData);
-        console.log('response for addbook:', response); // Log the entire response for debugging
-        
-          message.success('Book added successfully');
-          setIsModalVisible(false);
-  
-      } catch (error) {
-       
-      }
+     
     setIsModalVisible(false);
   };
+
+  const handleEdit = (book: Book) => {
+    console.log('book:', book);
+    setSelectedBookForEdit(book);
+    console.log('selectedBookForEdit:', selectedBookForEdit);
+    setIsEditModalVisible(true);
+  };
+
+  const handleDelete = async (book: Book | null) => {
+    console.log('book in delete:', book);
+  } 
 
 
 
   const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
+    { title: 'Title', dataIndex: 'title', key: 'title' },
     { title: 'ISBN', dataIndex: 'isbn', key: 'isbn' },
     { title: 'Author', dataIndex: 'author', key: 'author' },
     { title: 'Publisher', dataIndex: 'publisher', key: 'publisher' },
-    { 
-      title: 'Status', 
-      dataIndex: 'status', 
-      key: 'status', 
-      render: (status: string) => (
-        <Space size="middle">
-          {status === 'Available' ? <CheckCircleOutlined style={{ color: 'green' }} /> : <CloseCircleOutlined style={{ color: 'red' }} />}
-          <span>{status}</span>
-        </Space>
-      ),
-    },
     { 
       title: 'Book Condition', 
       dataIndex: 'bookCondition', 
@@ -183,9 +199,28 @@ const BookComponent: React.FC = () => {
         </Space>
       ),
     },
+    { 
+      title: 'Edit',
+      key: 'actions',
+      render: (text: any, record: Book) => (
+        <Space size="middle">
+          <Button onClick={() => handleEdit(record)}>Edit</Button>
+        </Space>
+      ),
+    },
+    { 
+      title: 'Delete',
+      key: 'delete',
+      render: (text: any, record: Book) => (
+        <Space size="middle">
+          <Button danger onClick={() => showDeleteModal(record)}>Delete</Button>
+        </Space>
+      ),
+    },
   ];
+  
 
-
+  // onClick={() => showModal(record)}
 
   return (
     <div>
@@ -198,15 +233,16 @@ const BookComponent: React.FC = () => {
         onChange={(e) => setSearchValue(e.target.value)}
         style={{ marginBottom: '16px' }}
       />
-      {/* <Table dataSource={dummyBooks} columns={columns} /> */}
+      <Table dataSource={allbooks} columns={columns} /> 
       <Modal 
       title="Add Book" 
-      open={isModalVisible} 
-      onOk={form.submit} 
-      onCancel={handleCancel}
-      okText= 'Add Book'
-      cancelButtonProps={{danger: true}}
-      okButtonProps={{type: 'primary'}}
+      open={isAddModalVisible} // Use "visible" instead of "open"
+      onCancel={() => {
+      setIsAddModalVisible(false);
+      form.resetFields();
+      }}
+      okText="Add Book"
+      onOk={form.submit}
       >
         <Form
           form={form}
@@ -257,6 +293,94 @@ const BookComponent: React.FC = () => {
 </Form.Item>
         </Form>
       </Modal>
+      <Modal 
+  title="Edit Book" 
+  open={isEditModalVisible} // Use "visible" instead of "open"
+  onCancel={() => {
+    setIsEditModalVisible(false);
+    form.resetFields();
+    setSelectedBookForEdit(null);
+  }}
+  okText="Save Changes"
+  onOk={form.submit}
+>
+  <Form
+    form={form}
+    onFinish={onFinish}
+    initialValues={selectedBookForEdit ? { ...selectedBookForEdit } : undefined}
+    onValuesChange={(changedValues, allValues) => {
+      setSelectedBookForEdit(prevState => ({
+        ...prevState,
+        ...changedValues
+      }));
+    }}
+    key={selectedBookForEdit?.id}
+  >
+    <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+      <Input />
+    </Form.Item>
+    <Form.Item name="isbn" label="ISBN" rules={[{ required: true }]}>
+      <Input />
+    </Form.Item>
+    <Form.Item name="author" label="Author" rules={[{ required: true }]}>
+      <Input />
+    </Form.Item>
+    <Form.Item name="publisher" label="Publisher" rules={[{ required: true }]}>
+      <Input />
+    </Form.Item>
+    <Form.Item name="categoryID" label="Category" rules={[{ required: true }]}>
+  <Select>
+    {categories.map(category => (
+     <Select.Option key={category.id} value={category.id}>
+     { category.name}
+    </Select.Option>
+    ))}
+  </Select>
+</Form.Item>
+
+    <Form.Item name="bookCondition" label="Book Condition" rules={[{ required: true }]}>
+      <Select>
+        <Select.Option value={BookCondition.Lost}>Lost</Select.Option>
+        <Select.Option value={BookCondition.Damaged}>Damaged</Select.Option>
+        <Select.Option value={BookCondition.Good}>Good</Select.Option>
+      </Select>
+    </Form.Item>
+    <Form.Item name="bookStatus" label="Book Status" rules={[{ required: true }]}>
+      <Select>
+        <Select.Option value={BookStatus.Available}>Available</Select.Option>
+        <Select.Option value={BookStatus.Unavailable}>Unavailable</Select.Option>
+      </Select>
+    </Form.Item>
+    <Form.Item name="image" label="Upload Image">
+      <Upload
+        showUploadList={true}
+        beforeUpload={handleBeforeUpload}
+        maxCount={1} // Limit the number of files to 1
+      >
+        <Button icon={<UploadOutlined />}>Click to Upload</Button>
+      </Upload>
+    </Form.Item>
+   
+  </Form>
+</Modal>
+<Modal
+  title="Delete Book"
+  open={isDeleteModalVisible}
+  onCancel={hideDeleteModal}
+  onOk={() => handleDelete(deleteBook)}
+  
+  footer={[
+    <Button key="cancel" onClick={hideDeleteModal}>
+      Cancel
+    </Button>,
+    <Button key="delete" type="primary" danger onClick={() => handleDelete(deleteBook)}>
+      Delete
+    </Button>,
+  ]}
+>
+  <p>Are you sure you want to delete this book?</p>
+</Modal>
+  
     </div>
   );
 };

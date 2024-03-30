@@ -22,6 +22,7 @@ export const  initialState: BookState = {
 export interface Action {
     type: string;
     payload: {
+      id: string;
         title: string;
         isbn: string;
         author: string;
@@ -31,6 +32,11 @@ export interface Action {
         bookCondition: number;
         file: undefined | string | ArrayBuffer | null;
     }; // Payload is optional, as it's only used for the LOGIN action
+}
+
+export interface GetAllAction{
+  type: string ; 
+  payload: BookState[]; 
 }
 
 export interface CategoryAction {
@@ -59,6 +65,7 @@ export interface CategoryAction {
       }
 
       export interface Book {
+        id: string;
         title: string;
         isbn: string;
         author: string;
@@ -85,7 +92,7 @@ export interface CategoryState {
   
   export interface BookActions {
     addBook: (Book: FormData) => void;
-    getBook: () => void; 
+    getBook: () => Promise<Book[]>; 
   }
 
   export interface CategoryActions {

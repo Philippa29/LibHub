@@ -6,7 +6,7 @@ enum ActionTypes {
     UPDATE_BOOK = 'UPDATE_BOOK',
     GET_CATEGORY = 'GET_CATEGORY',
     UPDATE_CATEGORY = 'UPDATE_CATEGORY', 
-    GET_BOOk = 'GET_BOOK',
+    GET_BOOk = 'GET_ALL_BOOKS',
 }
 
 
