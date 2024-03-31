@@ -36,7 +36,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
                 },
             });
     
-            if (!response.data.ok) {
+            if (!response.data.success) {
                 throw new Error('Network response was not ok');
             }
     
@@ -57,13 +57,59 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
             const response = await axios.get('https://localhost:44311/api/services/app/Book/GetAllBooks');
     
             // Handle the response data here, such as updating state or performing other actions
-            console.log(response.data);
+            console.log(response.data.result);
             dispatchallbooks({type: 'GET_ALL_BOOKS', payload: response.data.result});
             return response.data.result;
         } catch (error) {
             // Handle errors here
             console.error('Error fetching books:', error);
         }
+    }
+
+    const updateBook = async (book: FormData) => {
+
+        console.log("book in updateBook", book);
+        // try {
+        //     const response = await axios.put('https://localhost:44311/api/services/app/Book/UpdateBook', book, {
+        //         headers: {
+        //             'Content-Type': 'multipart/form-data',
+        //         },
+        //     });
+        //     if (response.data.success) {
+        //         message.success('Book updated successfully');
+        //         push('/books');
+        //     }
+        //     if (!response.data.success) {
+        //         throw new Error('Network response was not ok');
+        //     }
+        // } catch (err: any) {
+        //     if (err.response && err.response.status === 500) {
+        //         message.error('Internal Server Error: Please try again later');
+        //     } else {
+        //         message.error('An error occurred while updating book');
+        //     }
+        // }
+    }
+
+    const deleteBook = async (id: string) => {
+
+        try {
+            const response = await axios.delete(`https://localhost:44311/api/services/app/DeleteBook/${id}`);
+            console.log(response.data.success);
+            if(response.data.success){
+                message.success('Book deleted successfully');
+                push('/books');
+            }
+            if (!response.data.success) {
+                throw new Error('Network response was not ok');
+            }
+
+            //return 
+        }
+        catch{
+            message.error('An error occurred while deleting book');
+        }
+
     }
     
 
@@ -95,7 +141,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         <CategoryActionsContext.Provider value={{ getCategory }}>
        
         <BookStateContext.Provider value={state } >
-            <BookActionsContext.Provider value={{addBook , getBook}}>
+            <BookActionsContext.Provider value={{addBook , getBook, deleteBook, updateBook}}>
                 {children}
             </BookActionsContext.Provider>
         </BookStateContext.Provider> 

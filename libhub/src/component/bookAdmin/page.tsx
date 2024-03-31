@@ -5,7 +5,8 @@ import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined 
 import { useCategoryActions, useBookActions } from '@/providers/book';
 import { message } from 'antd';
 import { Book } from '@/providers/book/interface';
-import axios from 'axios';
+
+import { updateBook } from '@/providers/book/action';
 
 
 
@@ -33,15 +34,15 @@ const BookComponent: React.FC = () => {
   const [selectedBookForEdit, setSelectedBookForEdit] = useState<Book | null>(null);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false); // State for Add modal
 
-  const {addBook, getBook} = useBookActions();
+  const {addBook, getBook, deleteBook} = useBookActions();
   
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [deleteBook, setDeleteBook] = useState<Book | null>(null);
-  
+  const [deleteBookstate, setDeleteBookstate] = useState<Book | null>(null);
+  const isEditable = true; 
   const showDeleteModal = (book: Book) => {
-    setDeleteBook(book);
+    setDeleteBookstate(book);
     setIsDeleteModalVisible(true);
   };
 
@@ -50,7 +51,7 @@ const BookComponent: React.FC = () => {
   };
   
   const [book, setBook] = useState<Book>({
-    id: '',
+    bookId: '',
     title: '',
     isbn: '',
     author: '',
@@ -118,8 +119,10 @@ const BookComponent: React.FC = () => {
   };
   
   const showModal = () => {
+
     setIsModalVisible(true);
-    form.setFieldsValue({ categoryID: undefined }); // Reset category field value in the form
+    console.log('selectedBookForEdit in show:', selectedBookForEdit);
+    //form.setFieldsValue({ categoryID: undefined }); // Reset category field value in the form
   };
   
 
@@ -151,11 +154,43 @@ const BookComponent: React.FC = () => {
       formData.append('file', values?.image.file.originFileObj );
 
       console.log('formdata:', formData);
-
+      addBook(formData);
 
      
     setIsModalVisible(false);
   };
+
+  const onFinishUpdate = async (values: any) => {
+
+    console.log('values:', values);
+
+    console.log('values:', values);
+
+    const formData = new FormData();
+    formData.append('id', selectedBookForEdit?.bookId);
+    // Check if 'image' field is defined and has a file property before appending it to formData
+    if (values?.image && values?.image.file && values?.image.file.originFileObj) {
+      console.log("here if an image is uploaded"); 
+      formData.append('file', values?.image.file.originFileObj);
+    }
+    
+    formData.append('title', values?.title);
+    formData.append('author', values?.author);
+    formData.append('publisher', values?.publisher);
+    formData.append('categoryID', values?.categoryID);
+    formData.append('isbn', values?.isbn);
+    formData.append('bookStatus', values?.bookStatus.toString());
+    formData.append('bookCondition', values?.bookCondition.toString());
+  
+    updateBook(formData);
+    console.log('formdata:', formData);
+
+   
+    //addBook(formData);
+
+   
+  setIsModalVisible(false);
+};
 
   const handleEdit = (book: Book) => {
     console.log('book:', book);
@@ -166,6 +201,17 @@ const BookComponent: React.FC = () => {
 
   const handleDelete = async (book: Book | null) => {
     console.log('book in delete:', book);
+    console.log('book in delete:', book.bookId);
+
+    const response = await deleteBook(book?.bookId);
+  console.log('response:', response);
+    // if (response) {
+    //   setallbooks(allbooks.filter(b => b.id !== book?.id));
+    //   message.success('Book deleted successfully');
+    // } else {
+    //   message.error('An error occurred while deleting book');
+    // }
+    
   } 
 
 
@@ -224,21 +270,25 @@ const BookComponent: React.FC = () => {
 
   return (
     <div>
-      <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
-        Add
-      </Button>
+
       <Input.Search
         placeholder="Search books"
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
-        style={{ marginBottom: '16px' }}
+        style={{ marginBottom: '16px' , marginTop : '16px'}}
       />
       <Table dataSource={allbooks} columns={columns} /> 
+      <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+        Add Book
+      </Button>
+      <Button type="primary" icon={<PlusOutlined />} onClick={showModal} style={{ marginLeft: '10px' }}>
+  Add Category
+</Button>
       <Modal 
       title="Add Book" 
-      open={isAddModalVisible} // Use "visible" instead of "open"
+      open={isModalVisible} // Use "visible" instead of "open"
       onCancel={() => {
-      setIsAddModalVisible(false);
+      handleCancel();
       form.resetFields();
       }}
       okText="Add Book"
@@ -251,9 +301,20 @@ const BookComponent: React.FC = () => {
          <Form.Item name="title" label="Title" rules={[{ required: true }]}>
           <Input onChange={(e) => setBook({ ...book, title: e.target.value })} />
         </Form.Item>
-        <Form.Item name="isbn" label="ISBN" rules={[{ required: true }]}>
-             <Input onChange={(e) => setBook({ ...book, isbn: e.target.value })} />
-        </Form.Item>
+        <Form.Item name="isbn" label="ISBN" rules={[ { required: true, message: 'Please input the ISBN!' },
+        {
+            validator: (_, value) => {
+        if (!/^\d{13}$/.test(value)) {
+          return Promise.reject('ISBN must be exactly 13 digits long!');
+        }
+        return Promise.resolve();
+      },
+    },
+  ]}
+>
+  <Input onChange={(e) => setBook({ ...book, isbn: e.target.value })} />
+</Form.Item>
+
         <Form.Item name="author" label="Author" rules={[{ required: true }]}>
           <Input onChange={(e) => setBook({ ...book, author: e.target.value })} />
         </Form.Item>
@@ -295,7 +356,7 @@ const BookComponent: React.FC = () => {
       </Modal>
       <Modal 
   title="Edit Book" 
-  open={isEditModalVisible} // Use "visible" instead of "open"
+  visible={isEditModalVisible} // Use "visible" instead of "open"
   onCancel={() => {
     setIsEditModalVisible(false);
     form.resetFields();
@@ -306,7 +367,7 @@ const BookComponent: React.FC = () => {
 >
   <Form
     form={form}
-    onFinish={onFinish}
+    onFinish={onFinishUpdate}
     initialValues={selectedBookForEdit ? { ...selectedBookForEdit } : undefined}
     onValuesChange={(changedValues, allValues) => {
       setSelectedBookForEdit(prevState => ({
@@ -314,30 +375,20 @@ const BookComponent: React.FC = () => {
         ...changedValues
       }));
     }}
-    key={selectedBookForEdit?.id}
+    key={selectedBookForEdit?.bookId}
   >
     <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-      <Input />
+      <Input disabled={!isEditable} />
     </Form.Item>
     <Form.Item name="isbn" label="ISBN" rules={[{ required: true }]}>
-      <Input />
+      <Input disabled={!isEditable} />
     </Form.Item>
     <Form.Item name="author" label="Author" rules={[{ required: true }]}>
-      <Input />
+      <Input disabled={!isEditable} />
     </Form.Item>
     <Form.Item name="publisher" label="Publisher" rules={[{ required: true }]}>
-      <Input />
+      <Input disabled={!isEditable} />
     </Form.Item>
-    <Form.Item name="categoryID" label="Category" rules={[{ required: true }]}>
-  <Select>
-    {categories.map(category => (
-     <Select.Option key={category.id} value={category.id}>
-     { category.name}
-    </Select.Option>
-    ))}
-  </Select>
-</Form.Item>
-
     <Form.Item name="bookCondition" label="Book Condition" rules={[{ required: true }]}>
       <Select>
         <Select.Option value={BookCondition.Lost}>Lost</Select.Option>
@@ -346,7 +397,7 @@ const BookComponent: React.FC = () => {
       </Select>
     </Form.Item>
     <Form.Item name="bookStatus" label="Book Status" rules={[{ required: true }]}>
-      <Select>
+      <Select disabled>
         <Select.Option value={BookStatus.Available}>Available</Select.Option>
         <Select.Option value={BookStatus.Unavailable}>Unavailable</Select.Option>
       </Select>
@@ -360,20 +411,20 @@ const BookComponent: React.FC = () => {
         <Button icon={<UploadOutlined />}>Click to Upload</Button>
       </Upload>
     </Form.Item>
-   
   </Form>
 </Modal>
+
 <Modal
   title="Delete Book"
   open={isDeleteModalVisible}
   onCancel={hideDeleteModal}
-  onOk={() => handleDelete(deleteBook)}
+  // onOk={() => handleDelete(deleteBook)}
   
   footer={[
     <Button key="cancel" onClick={hideDeleteModal}>
       Cancel
     </Button>,
-    <Button key="delete" type="primary" danger onClick={() => handleDelete(deleteBook)}>
+    <Button key="delete" type="primary" htmlType='submit' danger onClick={() => handleDelete(deleteBookstate)}>
       Delete
     </Button>,
   ]}

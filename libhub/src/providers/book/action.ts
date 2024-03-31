@@ -13,3 +13,5 @@ enum ActionTypes {
 export const createBook = createAction(ActionTypes.CREATE_BOOK);
 export const getCategory = createAction(ActionTypes.GET_CATEGORY);
 export const getBook = createAction(ActionTypes.GET_BOOk);
+export const updateBook = createAction(ActionTypes.UPDATE_BOOK);
+export const deleteBook = createAction(ActionTypes.DELETE_BOOK);

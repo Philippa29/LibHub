@@ -9,6 +9,7 @@
 //   }
 
 export const  initialState: BookState = {
+  bookId: '',
     title: '',
     isbn: '',
     author: '',
@@ -34,6 +35,14 @@ export interface Action {
     }; // Payload is optional, as it's only used for the LOGIN action
 }
 
+export interface DeleteAction{
+  type: string ; 
+  payload: {
+    id: string;
+  }
+
+}
+
 export interface GetAllAction{
   type: string ; 
   payload: BookState[]; 
@@ -48,16 +57,17 @@ export interface CategoryAction {
   }
 }
 
-  export  interface BookState {
-    title: string;
-    isbn: string;
-    author: string;
-    publisher: string;
-    categoryID: string;
-    bookStatus: number;
-    bookCondition: number;
-    file: undefined | string | ArrayBuffer | null;
-    }
+export interface BookState {
+  bookId: string; // Change to lowercase 'bookId'
+  title: string;
+  isbn: string;
+  author: string;
+  publisher: string;
+  categoryID: string;
+  bookStatus: number;
+  bookCondition: number;
+  file: undefined | string | ArrayBuffer | null;
+}
 
     export  interface CategoryState {
       id: string;
@@ -65,7 +75,7 @@ export interface CategoryAction {
       }
 
       export interface Book {
-        id: string;
+        bookId: string;
         title: string;
         isbn: string;
         author: string;
@@ -92,7 +102,9 @@ export interface CategoryState {
   
   export interface BookActions {
     addBook: (Book: FormData) => void;
-    getBook: () => Promise<Book[]>; 
+    getBook: () => Promise<Book[]>;
+    deleteBook: (id: string) => void;
+    updateBook: (Book: FormData) => void; 
   }
 
   export interface CategoryActions {

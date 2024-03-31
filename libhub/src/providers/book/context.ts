@@ -4,6 +4,7 @@ import { BookActions, BookState , CategoryState, CategoryActions, Category, Book
 // Define types for context values
 
 export const initialState: BookState = {
+    bookId: '',
     title: '',
     isbn: '',
     author: '',
@@ -22,8 +23,10 @@ export const initialCategoryState: CategoryState = {
 
 export const BookStateContext = createContext<BookState>(initialState);
 export const BookActionsContext = createContext<BookActions>({
-    addBook: () => { } , 
-    getBook: async () => [] as Book[], 
+    addBook: async () => { } , 
+    getBook: async () => [] as Book[],
+    deleteBook: async () => {},
+    updateBook: async () => {}, 
 });
 
 export const CategoryStateContext = createContext<CategoryState>(initialCategoryState);

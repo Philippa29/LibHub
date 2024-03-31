@@ -1,8 +1,8 @@
-import { Action , BookState, CategoryAction, CategoryState, GetAllAction} from "./interface";
+import { Action , BookState, CategoryAction, CategoryState, DeleteAction, GetAllAction} from "./interface";
 
 type Books = BookState[];
   
-const addbookreducer = (state: BookState , action: Action) => {
+const addbookreducer = (state: BookState , action: Action ) => {
     //console.log("action", action);
     //console.log("state", state);
     switch (action.type) {
@@ -21,6 +21,9 @@ const addbookreducer = (state: BookState , action: Action) => {
 
             };
         }
+      
+
+
 
 
 
@@ -34,25 +37,45 @@ const addbookreducer = (state: BookState , action: Action) => {
 
 };
 
-const getallbooksreducer = (state : Books , action : GetAllAction)=>
-{
+const deleteBookreducer = (state: BookState , action: DeleteAction) => {
     switch (action.type) {
-        case 'GET_ALL_BOOKS':
+      case 'DELETE_BOOK':
+        if (action.payload) {
+            return {
+                ...state,
+              id: action.payload.id,
+            };
+        }
+        console.log("state in getBook", state);
+        return state;
+    
+
+        default:
+        return state;
+    }
+} 
+
+const getallbooksreducer = (state: Books, action: GetAllAction) => {
+  switch (action.type) {
+      case 'GET_ALL_BOOKS':
           if (action.payload) {
               console.log("action.payload in get_book", action.payload);
               console.log("state in getBook", state);
-              return [...action.payload];
-              
-          } 
-          
+              const booksWithId = action.payload.map((book, index) => {
+                  return {
+                      ...book,
+                      BookId: book.bookId // Assigning 'bookId' to the 'id' property
+                  };
+              });
+              return [...booksWithId];
+          }
           return state;
-  
-      
-  
-          default:
+    
+      default:
           return state;
-      }
+  }
 }
+
 
 
 
@@ -76,4 +99,4 @@ const categoryreducer = (state: CategoryState , action: CategoryAction) => {
     }
 } 
 
-export {addbookreducer , categoryreducer, getallbooksreducer};
+export {addbookreducer , categoryreducer, getallbooksreducer, deleteBookreducer};

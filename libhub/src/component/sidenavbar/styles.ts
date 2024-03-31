@@ -21,13 +21,12 @@ export const dashStyles = createStyles(({ css }) => ({
   `,
   sidebar: css`
  background-color: black; /* Set the background color for the sidebar */
-  position: sticky;
-  top: 0;
-  left: 0;
- 
-  width: 200px; /* Set the width of the sidebar */
-  z-index: 99; /* Ensure the sidebar is above the content */
-  overflow-y: auto;
+ position: sticky;
+ top: 0;
+ left: 0;
+ height: 100%; /* Set the height of the sidebar to 100% of its container */
+ width: 200px; /* Set the width of the sidebar */
+ z-index: 99; 
   `,
   layout: css`
     position: relative;

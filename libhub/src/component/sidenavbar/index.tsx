@@ -24,8 +24,12 @@ interface LinkType {
 const links: LinkType[] = [
   { key: "1", label: <Link href="../dashboard/user">User</Link>, icon: <UserOutlined /> },
   { key: "2", label: <Link href="../dashboard/meetingroom">Meeting Room</Link>, icon: <TeamOutlined /> },
-  { key: "3", label: <Link href="../dashboard/books">Books</Link>,  icon: <FileOutlined /> },
-  { key: "4", label: <Link href="">Sign Out</Link>, icon: <LogoutOutlined /> },
+  { key: "3", label: <Link href="../dashboard/books"> All Books</Link>,  icon: <FileOutlined /> },
+  { key: "3", label: <Link href="../dashboard/booksrequest">Book Requests</Link>,  icon: <FileOutlined /> },
+  { key: "3", label: <Link href="../dashboard/booksrequest">Loan Books</Link>,  icon: <FileOutlined /> },
+  { key: "3", label: <Link href="../dashboard/booksrequest">Return Books</Link>,  icon: <FileOutlined /> },
+  { key: "3", label: <Link href="../dashboard/booksrequest">Late Books</Link>,  icon: <FileOutlined /> },
+  
 ];
 
 const NavBar: React.FC = () => {
@@ -57,6 +61,20 @@ const NavBar: React.FC = () => {
         </Menu>
         
       </Sider>
+      <div style={{ backgroundColor: "#eeee", marginTop: "auto", marginLeft: "10px" }}> {/* Adjust marginLeft as needed */}
+      <Menu
+          style={{background:'#e4e2e6' , height: "100%"}}
+          mode="inline"
+          defaultSelectedKeys={["1"]}
+          theme="light" // Set theme to "light" for the menu
+        >
+          
+            <MenuItem  className={styles.menuItemHover}>
+            <Link href="">Sign Out</Link> <LogoutOutlined />
+            </MenuItem>
+        
+        </Menu>
+  </div>
     </div>
   );
 };
