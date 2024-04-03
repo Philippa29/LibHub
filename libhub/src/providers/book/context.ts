@@ -24,9 +24,10 @@ export const initialCategoryState: CategoryState = {
 export const BookStateContext = createContext<BookState>(initialState);
 export const BookActionsContext = createContext<BookActions>({
     addBook: async () => { } , 
-    getBook: async () => [] as Book[],
+    getBooks: async () => [] as Book[],
     deleteBook: async () => {},
     updateBook: async () => {}, 
+    getbookbyid: async () => ({ id: '', author: '', title: '', isbn: '' }),
 });
 
 export const CategoryStateContext = createContext<CategoryState>(initialCategoryState);

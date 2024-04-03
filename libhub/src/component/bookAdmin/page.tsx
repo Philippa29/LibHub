@@ -1,10 +1,15 @@
 'use client'
-import React, { useState, useEffect, use } from 'react';
-import { Input, Table, Space, Modal, Form, Button, Upload, Select } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useReducer } from 'react';
+import { Input, Table, Space, Modal, Form, Button, Upload, Select, Card, Image } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined , EyeOutlined} from '@ant-design/icons';
 import { useCategoryActions, useBookActions } from '@/providers/book';
 import { message } from 'antd';
 import { Book } from '@/providers/book/interface';
+import { useRouter } from 'next/navigation';
+import { useBookRequestState, useBookRequestActions } from '@/providers/bookrequest';
+import { BookRequestState } from '@/providers/bookrequest/interface';
+import { getallbooksreducer } from '@/providers/book/reducer';
+import { GetAllBookRequestReducer } from '@/providers/bookrequest/reducer';
 
 import { updateBook } from '@/providers/book/action';
 
@@ -20,11 +25,15 @@ enum BookCondition {
 enum BookStatus {
   Available = 1,
   Unavailable = 2,
+  Requested = 3,
 }
 
 
 
 const BookComponent: React.FC = () => {
+  const route = useRouter();
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [allbooks , setallbooks ] = useState<Book[]>([]); // Add this line
   const [searchValue, setSearchValue] = useState('');
@@ -34,7 +43,9 @@ const BookComponent: React.FC = () => {
   const [selectedBookForEdit, setSelectedBookForEdit] = useState<Book | null>(null);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false); // State for Add modal
 
-  const {addBook, getBook, deleteBook} = useBookActions();
+  const {addBook, getBooks, deleteBook} = useBookActions();
+
+  
   
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -88,7 +99,7 @@ const BookComponent: React.FC = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await getBook();
+        const response = await getBooks();
         console.log('response:', response);
         // Log the entire response for debugging
         if (response && Array.isArray(response)) {
@@ -103,6 +114,8 @@ const BookComponent: React.FC = () => {
   
     fetchBooks();
   }, []);
+
+  
   
   
   
@@ -192,6 +205,42 @@ const BookComponent: React.FC = () => {
   setIsModalVisible(false);
 };
 
+const handleView = (book: Book) => {
+  setSelectedBook(book);
+  setIsViewModalVisible(true);
+};
+
+const ViewModal = (
+<Modal
+  title="Book Details"
+  open={isViewModalVisible}
+  onCancel={() => setIsViewModalVisible(false)}
+  footer={null}
+>
+  {selectedBook && (
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <Card style={{ width: '60%' }}>
+        <Image
+          src="/logo.png"
+          alt="Book Cover"
+          width={150}
+          height={200}
+          style={{ marginRight: 20 }}
+        />
+        <div>
+          <p>Title: {selectedBook.title}</p>
+          <p>ISBN: {selectedBook.isbn}</p>
+          <p>Author: {selectedBook.author}</p>
+          <p>Publisher: {selectedBook.publisher}</p>
+          {/* Add other details as needed */}
+        </div>
+      </Card>
+    </div>
+  )}
+</Modal>
+
+);
+
   const handleEdit = (book: Book) => {
     console.log('book:', book);
     setSelectedBookForEdit(book);
@@ -199,18 +248,22 @@ const BookComponent: React.FC = () => {
     setIsEditModalVisible(true);
   };
 
+  const renderViewButton = (book: Book) => (
+    <Button type="primary" icon={<EyeOutlined />} onClick={() => handleView(book)}>
+      View
+    </Button>
+  );
+
   const handleDelete = async (book: Book | null) => {
     console.log('book in delete:', book);
     console.log('book in delete:', book.bookId);
 
     const response = await deleteBook(book?.bookId);
+    //route.push('/books'); 
+    setIsDeleteModalVisible(false);
+    window.location.reload();
   console.log('response:', response);
-    // if (response) {
-    //   setallbooks(allbooks.filter(b => b.id !== book?.id));
-    //   message.success('Book deleted successfully');
-    // } else {
-    //   message.error('An error occurred while deleting book');
-    // }
+   
     
   } 
 
@@ -240,17 +293,31 @@ const BookComponent: React.FC = () => {
       key: 'bookStatus', 
       render: (status: BookStatus) => (
         <Space size="middle">
-          {status === BookStatus.Available ? <CheckCircleOutlined style={{ color: 'green' }} /> : <CloseCircleOutlined style={{ color: 'red' }} />}
+          {status === BookStatus.Available ? <CheckCircleOutlined style={{ color: 'green' }} /> : null}
+          {status === BookStatus.Unavailable ? <CloseCircleOutlined style={{ color: 'red' }} /> : null}
+          {status === BookStatus.Requested ? <UploadOutlined style={{ color: 'blue' }} /> : null}
           <span>{BookStatus[status]}</span>
         </Space>
       ),
     },
+    
     { 
       title: 'Edit',
       key: 'actions',
       render: (text: any, record: Book) => (
         <Space size="middle">
           <Button onClick={() => handleEdit(record)}>Edit</Button>
+        </Space>
+      ),
+
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (text: any, record: Book) => (
+        <Space size="middle">
+          {renderViewButton(record)}
+          {/* Add other actions/buttons as needed */}
         </Space>
       ),
     },
@@ -266,7 +333,7 @@ const BookComponent: React.FC = () => {
   ];
   
 
-  // onClick={() => showModal(record)}
+  
 
   return (
     <div>
@@ -341,6 +408,7 @@ const BookComponent: React.FC = () => {
         <Select onChange={(value) => setBook({ ...book, bookStatus: value })} value={book.bookStatus}>
         <Select.Option value={BookStatus.Available}>Available</Select.Option>
         <Select.Option value={BookStatus.Unavailable}>Unavailable</Select.Option>
+        <Select.Option value={BookStatus.Requested}>Requested</Select.Option>
         </Select>
     </Form.Item>
         <Form.Item name="image" label="Upload Image">
@@ -356,7 +424,7 @@ const BookComponent: React.FC = () => {
       </Modal>
       <Modal 
   title="Edit Book" 
-  visible={isEditModalVisible} // Use "visible" instead of "open"
+  open={isEditModalVisible} // Use "visible" instead of "open"
   onCancel={() => {
     setIsEditModalVisible(false);
     form.resetFields();
@@ -397,11 +465,12 @@ const BookComponent: React.FC = () => {
       </Select>
     </Form.Item>
     <Form.Item name="bookStatus" label="Book Status" rules={[{ required: true }]}>
-      <Select disabled>
-        <Select.Option value={BookStatus.Available}>Available</Select.Option>
-        <Select.Option value={BookStatus.Unavailable}>Unavailable</Select.Option>
-      </Select>
-    </Form.Item>
+  <Select disabled>
+    <Select.Option value={BookStatus.Available}>Available</Select.Option>
+    <Select.Option value={BookStatus.Unavailable}>Unavailable</Select.Option>
+    <Select.Option value={BookStatus.Requested}>Requested</Select.Option> 
+  </Select>
+</Form.Item>
     <Form.Item name="image" label="Upload Image">
       <Upload
         showUploadList={true}
@@ -413,7 +482,7 @@ const BookComponent: React.FC = () => {
     </Form.Item>
   </Form>
 </Modal>
-
+{ViewModal}
 <Modal
   title="Delete Book"
   open={isDeleteModalVisible}

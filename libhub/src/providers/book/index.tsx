@@ -52,7 +52,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
     };
 
 
-    const getBook = async () => {
+    const getBooks = async () => {
         try {
             const response = await axios.get('https://localhost:44311/api/services/app/Book/GetAllBooks');
     
@@ -98,7 +98,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
             console.log(response.data.success);
             if(response.data.success){
                 message.success('Book deleted successfully');
-                push('/books');
+                //getBooks();
             }
             if (!response.data.success) {
                 throw new Error('Network response was not ok');
@@ -134,6 +134,16 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         }
     }
 
+    const getbookbyid = async (id: string) => {
+        try {
+            const response = await axios.get(`https://localhost:44311/api/services/app/GetBook/${id}`);
+            console.log(response.data.result);
+            return response.data.result;
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    }
+
     
 
     return (
@@ -141,7 +151,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         <CategoryActionsContext.Provider value={{ getCategory }}>
        
         <BookStateContext.Provider value={state } >
-            <BookActionsContext.Provider value={{addBook , getBook, deleteBook, updateBook}}>
+            <BookActionsContext.Provider value={{addBook , getBooks, deleteBook, updateBook,getbookbyid}}>
                 {children}
             </BookActionsContext.Provider>
         </BookStateContext.Provider> 

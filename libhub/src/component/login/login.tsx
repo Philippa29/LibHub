@@ -62,7 +62,7 @@ const Login = () => {
     } catch (error) {
       message.error('An error occurred while logging in');
     }
-    //router.push('/dashboard'); 
+    router.push('/dashboard'); 
   };
 
 

@@ -25,16 +25,22 @@ const links: LinkType[] = [
   { key: "1", label: <Link href="../dashboard/user">User</Link>, icon: <UserOutlined /> },
   { key: "2", label: <Link href="../dashboard/meetingroom">Meeting Room</Link>, icon: <TeamOutlined /> },
   { key: "3", label: <Link href="../dashboard/books"> All Books</Link>,  icon: <FileOutlined /> },
-  { key: "3", label: <Link href="../dashboard/booksrequest">Book Requests</Link>,  icon: <FileOutlined /> },
-  { key: "3", label: <Link href="../dashboard/booksrequest">Loan Books</Link>,  icon: <FileOutlined /> },
-  { key: "3", label: <Link href="../dashboard/booksrequest">Return Books</Link>,  icon: <FileOutlined /> },
-  { key: "3", label: <Link href="../dashboard/booksrequest">Late Books</Link>,  icon: <FileOutlined /> },
+  { key: "4", label: <Link href="../dashboard/booksrequest">Book Requests</Link>,  icon: <FileOutlined /> },
+  { key: "5", label: <Link href="../dashboard/borrowed">Borrowed Books</Link>,  icon: <FileOutlined /> },
+  { key: "6", label: <Link href="../dashboard/booksrequest">Return Books</Link>,  icon: <FileOutlined /> },
+  { key: "7", label: <Link href="../dashboard/booksrequest">Late Books</Link>,  icon: <FileOutlined /> },
   
 ];
 
 const NavBar: React.FC = () => {
   
   const {styles, cx} = dashStyles();
+
+  const handleLogout = () => {
+    localStorage.removeItem('authtoken');
+    //localStorage.removeItem('user');
+    window.location.href = '/login';
+  }
   
   return (
     
@@ -69,9 +75,9 @@ const NavBar: React.FC = () => {
           theme="light" // Set theme to "light" for the menu
         >
           
-            <MenuItem  className={styles.menuItemHover}>
-            <Link href="">Sign Out</Link> <LogoutOutlined />
-            </MenuItem>
+          <MenuItem className={styles.menuItemHover}>
+          <Link href="#" onClick={handleLogout}>Sign Out <LogoutOutlined /></Link>
+          </MenuItem>
         
         </Menu>
   </div>

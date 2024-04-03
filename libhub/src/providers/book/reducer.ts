@@ -1,4 +1,4 @@
-import { Action , BookState, CategoryAction, CategoryState, DeleteAction, GetAllAction} from "./interface";
+import { Action , BookState, CategoryAction, CategoryState, DeleteAction, GetAllAction, getbookbyidAction, getBookbyidstate} from "./interface";
 
 type Books = BookState[];
   
@@ -21,6 +21,16 @@ const addbookreducer = (state: BookState , action: Action ) => {
 
             };
         }
+
+        case 'GET_BOOK_BY_ID':
+          if (action.payload) {
+              return {
+                  ...state,
+                id: action.payload.id,
+                title: action.payload.title,
+                isbn: action.payload.isbn,
+              }; 
+          }
       
 
 
@@ -36,6 +46,50 @@ const addbookreducer = (state: BookState , action: Action ) => {
     }
 
 };
+
+const getBookByIdInitialState: GetBookByIdState = {
+  author: '',
+  title: '',
+  isbn: '',
+};
+
+const getBookByIdReducer = (state: getBookbyidstate[], action: GetBookByIdAction) => {
+  switch (action.type) {
+    case 'GET_BOOK_BY_ID':
+      // Add the new book detail to the state array
+      return [
+        ...state,
+        {
+          id: action.payload.id,
+          author: action.payload.author,
+          title: action.payload.title,
+          isbn: action.payload.isbn,
+          // Include other properties as needed
+        }
+      ];
+    default:
+      return state;
+  }
+};
+
+
+export interface GetBookByIdState {
+  author: string;
+  title: string;
+  isbn: string;
+}
+
+export interface GetBookByIdAction {
+  type: string;
+  payload: {
+    id: string;
+    author: string;
+    title: string;
+    isbn: string;
+  };
+}
+
+
 
 const deleteBookreducer = (state: BookState , action: DeleteAction) => {
     switch (action.type) {
@@ -99,4 +153,4 @@ const categoryreducer = (state: CategoryState , action: CategoryAction) => {
     }
 } 
 
-export {addbookreducer , categoryreducer, getallbooksreducer, deleteBookreducer};
+export {addbookreducer , categoryreducer, getallbooksreducer, deleteBookreducer,getBookByIdReducer};

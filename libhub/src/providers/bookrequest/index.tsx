@@ -1,3 +1,4 @@
+'use client'
 import React, { useContext, useReducer } from 'react';
 import axios from 'axios';
 import { BookRequestActionsContext, BookRequestStateContext, initialState } from './context';
@@ -13,7 +14,7 @@ const BookRequestProvider: React.FC<BookRequestProps> = ({ children }) => {
     const getAllBookRequest = async () => {
         try {
             const response = await axios.get('https://localhost:44311/api/services/app/BookRequest/GetAllBookRequests');
-            console.log(response.data.result);
+            console.log("reponse in the provider: " , response);
             return response.data.result;
         } catch (error) {
             console.error('Error fetching book requests:', error);

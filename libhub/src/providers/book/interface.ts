@@ -1,12 +1,4 @@
-// export interface Credentials {
-//     userNameOrEmailAddress: string;
-//     password: string;
-//   }
 
-//  export  interface AuthState {
-//     isAuthenticated: boolean;
-//     authToken: string | null;
-//   }
 
 export const  initialState: BookState = {
   bookId: '',
@@ -35,13 +27,35 @@ export interface Action {
     }; // Payload is optional, as it's only used for the LOGIN action
 }
 
+export interface getbookbyidAction {
+  type: string;
+  payload: {
+    
+    title: string;
+    isbn: string;
+    author: string;
+  } 
+}
+
 export interface DeleteAction{
   type: string ; 
   payload: {
     id: string;
   }
 
+
+
 }
+
+
+export interface getBookbyidstate{
+  id: string;
+  author: string;
+  title: string;
+  isbn: string;
+ 
+}
+
 
 export interface GetAllAction{
   type: string ; 
@@ -102,9 +116,10 @@ export interface CategoryState {
   
   export interface BookActions {
     addBook: (Book: FormData) => void;
-    getBook: () => Promise<Book[]>;
+    getBooks: () => Promise<Book[]>;
     deleteBook: (id: string) => void;
     updateBook: (Book: FormData) => void; 
+    getbookbyid: (id: string) => Promise<getBookbyidstate>;
   }
 
   export interface CategoryActions {

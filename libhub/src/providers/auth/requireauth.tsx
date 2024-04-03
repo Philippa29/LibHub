@@ -1,33 +1,28 @@
-import React from 'react';
+'use client'
+import React, { ComponentType, FC } from 'react';
 import { useAuthState } from './index';
-import { Navigate, RouteProps } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
-// Adjust AuthenticatedComponentProps to extend RouteProps
-interface AuthenticatedComponentProps {
-
-
-}
-
-const RequireAuth = <P extends AuthenticatedComponentProps>(
-  WrappedComponent: React.ComponentType<P>
-) => {
-  const AuthenticatedComponent: React.FC<P> = (props) => {
+export const RequireAuth = <P extends object>(Component: ComponentType<P>): FC<P> => {
+  const router = useRouter();
+  const WrappedComponent: FC<P> = (props) => {
     const isAuthenticated = useAuthState(); // Assuming this returns a boolean
-
     console.log("isAuthenticated", isAuthenticated);
-
     const authToken = window.localStorage.getItem('authToken');
 
     if (!authToken || !isAuthenticated) {
       // Redirect to the login page or handle unauthorized access
-      return <Navigate to="/dashboard" />;
+      router.push("/login");
+      return null; // Return null when redirecting
     }
 
-    return <WrappedComponent {...props } />;
+    // Render the wrapped component if authenticated
+    return <Component {...props} />;
   };
 
-  return AuthenticatedComponent;
+  return WrappedComponent;
 };
 
-export default RequireAuth;
+
+
 

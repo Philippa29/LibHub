@@ -6,8 +6,10 @@ const GetAllBookRequestReducer = (state: BookRequests, action: GetAllAction) => 
     switch (action.type) {
         case 'GET_BOOKREQUEST':
             if (action.payload) {
-                const bookRequests = action.payload.map((bookRequest) => {
+                console.log("action.payload for book request", action.payload)
+                const bookRequests = action.payload.map((bookRequest, index) => {
                     return {
+                        ...bookRequest,
                         bookId: bookRequest.bookId,
                         studentId: bookRequest.studentId,
                     };

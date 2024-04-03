@@ -16,7 +16,7 @@ export interface BookRequestState {
 }
 
 export interface BookRequestAction {
-    getAllBookRequest: () => Promise<BookRequestState[]>;
+    getAllBookRequest: () => Promise<BookRequest[]>;
 }
 
 export interface Action {
