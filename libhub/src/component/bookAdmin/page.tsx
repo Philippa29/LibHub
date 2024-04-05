@@ -1,7 +1,7 @@
 'use client'
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, Suspense } from 'react';
 import { Input, Table, Space, Modal, Form, Button, Upload, Select, Card, Image } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined , EyeOutlined} from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined , EyeOutlined, FileSyncOutlined } from '@ant-design/icons';
 import { useCategoryActions, useBookActions } from '@/providers/book';
 import { message } from 'antd';
 import { Book } from '@/providers/book/interface';
@@ -10,7 +10,7 @@ import { useBookRequestState, useBookRequestActions } from '@/providers/bookrequ
 import { BookRequestState } from '@/providers/bookrequest/interface';
 import { getallbooksreducer } from '@/providers/book/reducer';
 import { GetAllBookRequestReducer } from '@/providers/bookrequest/reducer';
-
+import RequireAuth from '@/providers/auth/requireauth';
 import { updateBook } from '@/providers/book/action';
 
 
@@ -37,13 +37,14 @@ const BookComponent: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [allbooks , setallbooks ] = useState<Book[]>([]); // Add this line
   const [searchValue, setSearchValue] = useState('');
+  const [selectedBookImage, setSelectedBookImage] = useState<string | null>(null);
   
   const {getCategory} = useCategoryActions();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedBookForEdit, setSelectedBookForEdit] = useState<Book | null>(null);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false); // State for Add modal
 
-  const {addBook, getBooks, deleteBook} = useBookActions();
+  const {addBook, getBooks, deleteBook, getImage, updateBook} = useBookActions();
 
   
   
@@ -64,6 +65,7 @@ const BookComponent: React.FC = () => {
   const [book, setBook] = useState<Book>({
     bookId: '',
     title: '',
+    imageId: '',
     isbn: '',
     author: '',
     publisher: '',
@@ -177,26 +179,36 @@ const BookComponent: React.FC = () => {
 
     console.log('values:', values);
 
-    console.log('values:', values);
+    //console.log('values:', values);
 
     const formData = new FormData();
-    formData.append('id', selectedBookForEdit?.bookId);
+    const formDataImage = new FormData();
+    console.log(formData, "FORM_DATA_UPDATE_VALES")
+    formData.append('bookId', selectedBookForEdit?.bookId);
+    formData.append('imageId', selectedBookForEdit?.imageId);
     // Check if 'image' field is defined and has a file property before appending it to formData
     if (values?.image && values?.image.file && values?.image.file.originFileObj) {
       console.log("here if an image is uploaded"); 
-      formData.append('file', values?.image.file.originFileObj);
+      formDataImage.append('file', values?.image.file.originFileObj);
+      formDataImage.append('id', selectedBookForEdit?.imageId);
+      
     }
     
     formData.append('title', values?.title);
+    console.log("formdata", formData.get('title'));
     formData.append('author', values?.author);
     formData.append('publisher', values?.publisher);
-    formData.append('categoryID', values?.categoryID);
+    formData.append('categoryID', selectedBookForEdit?.categoryID);
     formData.append('isbn', values?.isbn);
     formData.append('bookStatus', values?.bookStatus.toString());
     formData.append('bookCondition', values?.bookCondition.toString());
-  
-    updateBook(formData);
-    console.log('formdata:', formData);
+  console.log('formdata ent:', formData.values());
+  // console.log('formData content:');
+  // for (const pair of formData.entries()) {
+  //     console.log(pair[0] + ', ' + pair[1]);
+  // }
+    updateBook(formData, formDataImage);
+    
 
    
     //addBook(formData);
@@ -205,41 +217,50 @@ const BookComponent: React.FC = () => {
   setIsModalVisible(false);
 };
 
-const handleView = (book: Book) => {
+const handleView = async (book: Book) => {
   setSelectedBook(book);
   setIsViewModalVisible(true);
+  
+  try {
+      const base64Image = await getImage(book.imageId);
+      setSelectedBookImage(base64Image);
+  } catch (error) {
+      console.error('Error fetching image:', error);
+      // Handle error if necessary
+  }
 };
 
 const ViewModal = (
-<Modal
-  title="Book Details"
-  open={isViewModalVisible}
-  onCancel={() => setIsViewModalVisible(false)}
-  footer={null}
->
-  {selectedBook && (
-    <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <Card style={{ width: '60%' }}>
-        <Image
-          src="/logo.png"
-          alt="Book Cover"
-          width={150}
-          height={200}
-          style={{ marginRight: 20 }}
-        />
-        <div>
-          <p>Title: {selectedBook.title}</p>
-          <p>ISBN: {selectedBook.isbn}</p>
-          <p>Author: {selectedBook.author}</p>
-          <p>Publisher: {selectedBook.publisher}</p>
-          {/* Add other details as needed */}
-        </div>
-      </Card>
-    </div>
-  )}
-</Modal>
-
+  <Modal
+    title="Book Details"
+    open={isViewModalVisible}
+    onCancel={() => setIsViewModalVisible(false)}
+    footer={null}
+  >
+    {selectedBook && (
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Card style={{ width: '60%' }}>
+          <Image
+            src={selectedBookImage || "/logo.png"} // Use the selectedBookImage if available, otherwise use a default image
+            alt="Book Cover"
+            width={150}
+            height={200}
+            style={{ marginRight: 20 }}
+          />
+          <div>
+            <p>Title: {selectedBook.title}</p>
+            <p>ISBN: {selectedBook.isbn}</p>
+            <p>Author: {selectedBook.author}</p>
+            <p>Publisher: {selectedBook.publisher}</p>
+            {/* Add other details as needed */}
+          </div>
+        </Card>
+      </div>
+    )}
+  </Modal>
 );
+
+
 
   const handleEdit = (book: Book) => {
     console.log('book:', book);
@@ -295,7 +316,7 @@ const ViewModal = (
         <Space size="middle">
           {status === BookStatus.Available ? <CheckCircleOutlined style={{ color: 'green' }} /> : null}
           {status === BookStatus.Unavailable ? <CloseCircleOutlined style={{ color: 'red' }} /> : null}
-          {status === BookStatus.Requested ? <UploadOutlined style={{ color: 'blue' }} /> : null}
+          {status === BookStatus.Requested ? <FileSyncOutlined  style={{ color: 'blue' }} /> : null}
           <span>{BookStatus[status]}</span>
         </Space>
       ),
@@ -336,6 +357,7 @@ const ViewModal = (
   
 
   return (
+    <Suspense fallback={<div>Loading...</div>}>
     <div>
 
       <Input.Search
@@ -502,6 +524,7 @@ const ViewModal = (
 </Modal>
   
     </div>
+    </Suspense>
   );
 };
 

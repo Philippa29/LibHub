@@ -7,6 +7,7 @@ export const  initialState: BookState = {
     author: '',
     publisher: '',
     categoryID: '',
+    imageId: '',
     bookStatus: 0,
     bookCondition: 0,
     file: null,
@@ -80,6 +81,7 @@ export interface BookState {
   categoryID: string;
   bookStatus: number;
   bookCondition: number;
+  imageId: string;
   file: undefined | string | ArrayBuffer | null;
 }
 
@@ -96,6 +98,7 @@ export interface BookState {
         publisher: string;
         categoryID: string;
         bookStatus: number;
+        imageId: string;
         bookCondition: number;
         file: {
           base64String: string;
@@ -113,13 +116,20 @@ export interface CategoryState {
   name: string;
 }
 
+export interface GetImageAction{
+  type: string ; 
+  payload: string;
+}
+
   
   export interface BookActions {
     addBook: (Book: FormData) => void;
     getBooks: () => Promise<Book[]>;
     deleteBook: (id: string) => void;
-    updateBook: (Book: FormData) => void; 
+    updateBook: (Book: FormData , Image: FormData) => void; 
     getbookbyid: (id: string) => Promise<getBookbyidstate>;
+    getImage: (id: string) => Promise<string>;
+    updateImage: (id: string, Image: FormData) => void;
   }
 
   export interface CategoryActions {

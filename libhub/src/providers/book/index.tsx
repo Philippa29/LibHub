@@ -66,29 +66,77 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         }
     }
 
-    const updateBook = async (book: FormData) => {
+    const getImage = async (id: string) => {
+        try {
+            console.log("id in getImage", id);
+            const response = await axios.get(`https://localhost:44311/GetStoredFile/${id}`, {
+                responseType: 'arraybuffer' // Set responseType to arraybuffer to handle binary data
+            });
+            console.log("response in getImage", response.data);
+    
+            // Convert arraybuffer to base64
+            const base64Data = btoa(
+                new Uint8Array(response.data)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+    
+            // Create a base64 string with appropriate data URI
+            const base64Image = `data:${response.headers['content-type']};base64,${base64Data}`;
+
+            console.log("base64Image", base64Image);
+    
+            // Return the base64 string
+            return base64Image;
+        } catch (error) {
+            console.error('Error fetching image:', error);
+            // Handle errors or return a default image URL
+            return ''; // or throw error if you prefer
+        }
+    }
+
+    const updateBook = async (book: FormData, image : FormData) => {
+
+       
+          
 
         console.log("book in updateBook", book);
-        // try {
-        //     const response = await axios.put('https://localhost:44311/api/services/app/Book/UpdateBook', book, {
-        //         headers: {
-        //             'Content-Type': 'multipart/form-data',
-        //         },
-        //     });
-        //     if (response.data.success) {
-        //         message.success('Book updated successfully');
-        //         push('/books');
-        //     }
-        //     if (!response.data.success) {
-        //         throw new Error('Network response was not ok');
-        //     }
-        // } catch (err: any) {
-        //     if (err.response && err.response.status === 500) {
-        //         message.error('Internal Server Error: Please try again later');
-        //     } else {
-        //         message.error('An error occurred while updating book');
-        //     }
-        // }
+
+        //i want to make sure if there is no image update that the image is not updated
+        console.log("image" , image.get('file')); 
+        if(image.get('file') !== null){
+            const reponse = await updateImage(book.get('imageId') as string, image);
+            console.log("response in updateBook", reponse);
+        }
+
+        
+
+        
+
+        const id = book.get('bookId')
+
+        console.log("id in updateBook", id)
+        
+        console.log(book.keys())
+        try {
+            const response = await axios.put(`https://localhost:44311/api/services/app/UpdateBook/${id}`, book, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+            if (response.data.success) {
+                message.success('Book updated successfully');
+                //push('/books');
+            }
+            if (!response.data.success) {
+                throw new Error('Network response was not ok');
+            }
+        } catch (err: any) {
+            if (err.response && err.response.status === 500) {
+                message.error('Internal Server Error: Please try again later');
+            } else {
+                message.error('An error occurred while updating book');
+            }
+        }
     }
 
     const deleteBook = async (id: string) => {
@@ -144,6 +192,31 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         }
     }
 
+    const updateImage = async (id: string, image: FormData) => {
+        try {
+
+            image.append('id', id);
+            const response = await axios.put(`https://localhost:44311/api/services/app/UpdateImage/${id}`, image, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (response.data.success) {
+                message.success('Image updated successfully');
+                //push('/books');
+            }
+            if (!response.data.success) {
+                throw new Error('Network response was not ok');
+            }
+        } catch (err: any) {
+            if (err.response && err.response.status === 500) {
+                message.error('Internal Server Error: Please try again later');
+            } else {
+                message.error('An error occurred while updating image');
+            }
+        }
+    }
+
     
 
     return (
@@ -151,7 +224,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         <CategoryActionsContext.Provider value={{ getCategory }}>
        
         <BookStateContext.Provider value={state } >
-            <BookActionsContext.Provider value={{addBook , getBooks, deleteBook, updateBook,getbookbyid}}>
+            <BookActionsContext.Provider value={{addBook , getBooks, deleteBook, updateBook,getbookbyid, getImage,updateImage}}>
                 {children}
             </BookActionsContext.Provider>
         </BookStateContext.Provider> 

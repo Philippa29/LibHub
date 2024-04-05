@@ -4,6 +4,9 @@ import {BookRequestState, BookRequest, BookRequestAction} from './interface';
 export const initialState: BookRequestState = {
     bookId: '',
     studentId: '',
+    title: '',
+    author: '',
+    isbn: '',
     
 }
 

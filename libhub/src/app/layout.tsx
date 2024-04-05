@@ -1,8 +1,9 @@
 
-import { RequireAuth } from "@/providers/auth/requireauth";
 import { BookProvider } from "@/providers/book/index";
 import { BookRequestProvider } from "@/providers/bookrequest";
+import { LoanProvider } from "@/providers/loan";
 import dynamic from "next/dynamic"; 
+import { Suspense } from "react";
 
 export const metadata = {
   title: 'Libhub',
@@ -21,7 +22,10 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 
     // ...
 
-    //<AuthenticatedComponent>
+   
+
+
+    <LoanProvider>
       <BookRequestProvider>
         <BookProvider>
           <html lang="en">
@@ -33,9 +37,10 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             </head>
             <body style={{ margin: 0 }}>{children}</body>
           </html>
+          
         </BookProvider>
       </BookRequestProvider>
-    // </AuthenticatedComponent> */}
+    </LoanProvider>
   );
 }
 

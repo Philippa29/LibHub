@@ -1,4 +1,4 @@
-import { Action , BookState, CategoryAction, CategoryState, DeleteAction, GetAllAction, getbookbyidAction, getBookbyidstate} from "./interface";
+import { Action , BookState, CategoryAction, CategoryState, DeleteAction, GetAllAction, getBookbyidstate , GetImageAction} from "./interface";
 
 type Books = BookState[];
   
@@ -89,6 +89,24 @@ export interface GetBookByIdAction {
   };
 }
 
+const getImageReducer = (state: string, action: GetImageAction) => {
+  switch (action.type) {
+    case 'GET_IMAGE':
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+const updateImageReducer = (state: string, action: GetImageAction) => {
+  switch (action.type) {
+    case 'UPDATE_IMAGE':
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
 
 
 const deleteBookreducer = (state: BookState , action: DeleteAction) => {
@@ -153,4 +171,4 @@ const categoryreducer = (state: CategoryState , action: CategoryAction) => {
     }
 } 
 
-export {addbookreducer , categoryreducer, getallbooksreducer, deleteBookreducer,getBookByIdReducer};
+export {addbookreducer , categoryreducer, getallbooksreducer, deleteBookreducer,getBookByIdReducer,getImageReducer,updateImageReducer};

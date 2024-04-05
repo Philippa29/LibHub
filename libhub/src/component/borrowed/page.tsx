@@ -1,52 +1,62 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, Button } from 'antd';
-//import 'antd/dist/antd.css'; // Import Ant Design styles
-
-interface Book {
-  key: number;
-  id: number;
-  title: string;
-  author: string;
-  borrowed: boolean;
-}
+import { useLoanActions } from '@/providers/loan';
+import { LoanState } from '@/providers/loan/interface';
 
 const BorrowedBooksPage: React.FC = () => {
-  // Mock data for borrowed books
-  const [books, setBooks] = useState<Book[]>([
-    { key: 1, id: 1, title: 'Book 1', author: 'Author 1', borrowed: true },
-    { key: 2, id: 2, title: 'Book 2', author: 'Author 2', borrowed: true },
-    { key: 3, id: 3, title: 'Book 3', author: 'Author 3', borrowed: false },
-    // Add more books as needed
-  ]);
+  const [loans, setLoans] = useState<LoanState[]>([]);
 
-  const handleReturn = (id: number) => {
-    // Update the borrowed status of the book with the given id
-    setBooks(prevBooks =>
-      prevBooks.map(book =>
-        book.id === id ? { ...book, borrowed: false } : book
-      )
-    );
+  const handleReturn = (id: string) => {
+    console.log('Returning book with ID:', id);
   };
 
   const columns = [
     {
-      title: 'Title',
+      title: 'Student ID',
+      dataIndex: 'student',
+      key: 'studentId',
+    },
+    {
+      title: 'Librarian ID',
+      dataIndex: 'librarian',
+      key: 'librarianId',
+    },
+    {
+      title: 'Book Title',
       dataIndex: 'title',
       key: 'title',
     },
     {
-      title: 'Author',
-      dataIndex: 'author',
-      key: 'author',
+      title: 'Book ISBN',
+      dataIndex: 'isbn',
+      key: 'isbn',
     },
     {
-      title: 'Action',
-      key: 'action',
-      render: (text: any, record: Book) => (
+      title: 'Loan Date',
+      dataIndex: 'loanDate',
+      key: 'loanDate',
+    },
+    {
+      title: 'Return Date',
+      dataIndex: 'returnDate',
+      key: 'returnDate',
+    },
+    {
+      title: 'Overdue',
+      dataIndex: 'isOverdue',
+      key: 'isOverdue',
+      render: (isOverdue: boolean) => (
+        <span>{isOverdue ? 'Yes' : 'No'}</span>
+      ),
+    },
+    {
+      title: 'Return Book',
+      key: 'ReturnBook',
+      render: (text: any, record: LoanState) => (
         <Button
           type="primary"
           onClick={() => handleReturn(record.id)}
-          disabled={!record.borrowed}
+          disabled={record.isReturned}
         >
           Return
         </Button>
@@ -54,10 +64,46 @@ const BorrowedBooksPage: React.FC = () => {
     },
   ];
 
+  const { getAllLoans } = useLoanActions();
+  //const {loanState , loansDispatch} = useState<LoanState []>([]);
+  
+  useEffect(() => {
+    const fetchLoans = async () => {
+      try {
+        const loans = await getAllLoans(); // Check if getAllLoans is correctly implemented and called
+        console.log('All loans:', loans);
+        setLoans(loans);
+      } catch (error) {
+        console.error('Error fetching loans:', error);
+      }
+    };
+
+    fetchLoans();
+  }, [getAllLoans]); 
+
+  const data: LoanState[] = loans.map((loan, index) => {
+    return {
+      id: index.toString(), // You can generate the id dynamically based on index or use another unique identifier
+      bookRequest: '', // Add the bookRequest property here if it's relevant
+      book: '', // Add the book property here if it's relevant
+      isReturned: false, // Add the isReturned property here if it's relevant
+      isOverdue: false, // Add the isOverdue property here if it's relevant
+      actualReturnDate: new Date(), // Add the actualReturnDate property here if it's relevant
+      key: index,
+      student: loan.student,
+      librarian: loan.librarian,
+      author: loan.author,
+      title: loan.title,
+      isbn: loan.isbn,
+      loanDate: loan.loanDate,
+      returnDate: loan.returnDate,
+    };
+  });
+
   return (
     <div>
       <h1>Borrowed Books</h1>
-      <Table dataSource={books} columns={columns} />
+      <Table dataSource={data} columns={columns} />
     </div>
   );
 };

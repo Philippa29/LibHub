@@ -34,7 +34,14 @@ const Register : React.FC<RegisterProps> = ({ onClose,open }) => {
   const [registerCredentials, setRegisterCredentials] = useState<RegisterCredentials>({ name: '', surname: '', emailAddress: '', phoneNumber: '', password: '', studentID: '' });
 //const [isModalVisible, setIsModalVisible] = useState(false);
 
+const [isRegisterButtonDisabled, setIsRegisterButtonDisabled] = useState(true);
 
+const handleFieldsChange = () => {
+  form.validateFields().then((values) => {
+    const isAllFieldsValid = Object.values(values).every((field) => field !== undefined);
+    setIsRegisterButtonDisabled(!isAllFieldsValid);
+  });
+};
 
 
   const onFinish = async () => { 
@@ -59,6 +66,7 @@ const Register : React.FC<RegisterProps> = ({ onClose,open }) => {
           okText='Register'
           cancelButtonProps={{danger: true}}
           okButtonProps={{type: 'primary'}}
+          
         >
           <Form name="register" form={form}  onFinish={onFinish} initialValues={{ remember: true }}>
             <Form.Item
@@ -86,27 +94,37 @@ const Register : React.FC<RegisterProps> = ({ onClose,open }) => {
               />
             </Form.Item>
             <Form.Item
-              name="studentID"
-              rules={[
-                { required: true, message: 'Please input your student ID!' },
-                {
-                  len: 8,
-                  message: 'Student ID must be exactly 8 characters long',
-                },
-                {
-                  pattern: /^[0-9]+$/,
-                  message: 'Student ID must contain only numbers',
-                },
-              ]}
-            >
-              <Input
-                prefix={<IdcardOutlined />}
-                placeholder="Student ID"
-                onChange={(e) =>
-                  setRegisterCredentials({ ...registerCredentials, studentID: e.target.value })
-                }
-              />
-            </Form.Item>
+  name="studentID"
+  rules={[
+    { required: true, message: 'Please input your student ID!' },
+    {
+      len: 9,
+      message: 'Student ID must be exactly 9 characters long',
+    },
+    {
+      pattern: /^[0-9uU]+$/,
+      message: 'Student ID must contain only numbers and the letter "u"',
+    },
+    {
+      validator: (rule, value) => {
+        if (value && !value.toLowerCase().includes('u')) {
+          return Promise.reject('Student ID must contain the letter "u"');
+        }
+        return Promise.resolve();
+      },
+    },
+  ]}
+>
+  <Input
+    prefix={<IdcardOutlined />}
+    placeholder="Student ID"
+    onChange={(e) =>
+      setRegisterCredentials({ ...registerCredentials, studentID: e.target.value })
+    }
+  />
+</Form.Item>
+
+
             <Form.Item
               name="phoneNumber"
               rules={[{ required: true, message: 'Please input your phone number!' }]}

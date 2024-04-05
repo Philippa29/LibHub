@@ -1,12 +1,16 @@
 'use client'
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect, use, Suspense } from 'react';
 import BookComponent from '@/component/bookAdmin/page';
-
+import RequireAuth from '@/providers/auth/requireauth';
 
 
 const BookDashboard: React.FC = () => {
     return(
-      <BookComponent></BookComponent>
+           
+            <BookComponent />
+           
+            // </RequireAuth> */}
+      
     ); 
 };
 

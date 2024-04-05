@@ -55,6 +55,15 @@ const Login = () => {
       console.log('authToken', authToken);
       if (authToken) {
         message.success('Login successful');
+
+        const firstLetter = credentials.userNameOrEmailAddress.trim().charAt(0).toLowerCase();
+      
+        // Redirect based on the first letter
+        if (firstLetter === 's') {
+          router.push('/dashboard'); // Redirect to dashboard if the first letter is 's'
+        } else if (firstLetter === 'u') {
+          router.push('/landingpage'); // Redirect to landingpage if the first letter is 'u'
+        }
         
       } else {
         message.error('Wrong password or username');
@@ -62,12 +71,17 @@ const Login = () => {
     } catch (error) {
       message.error('An error occurred while logging in');
     }
-    router.push('/dashboard'); 
+   
   };
 
 
 
-
+  const validateUsername = (rule: any, value: string) => {
+    if (!value || (value.trim().length === 9 && ['s', 'u'].includes(value.trim().charAt(0).toLowerCase()))) {
+      return Promise.resolve();
+    }
+    return Promise.reject('Username must start with "s" or "u"');
+  };
 
 
   return (
@@ -87,12 +101,15 @@ const Login = () => {
           }}
           onFinish={onFinish} // Handle form submission
         >
-          <Form.Item
+       <Form.Item
             name="username"
             rules={[
               {
                 required: true,
                 message: 'Please input your Username!',
+              },
+              {
+                validator: validateUsername,
               },
             ]}
           >

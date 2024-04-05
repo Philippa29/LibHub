@@ -12,6 +12,7 @@ export const initialState: BookState = {
     categoryID: '',
     bookStatus: 0,
     bookCondition: 0,
+    imageId: '',
     file: '',
 }
 
@@ -28,6 +29,8 @@ export const BookActionsContext = createContext<BookActions>({
     deleteBook: async () => {},
     updateBook: async () => {}, 
     getbookbyid: async () => ({ id: '', author: '', title: '', isbn: '' }),
+    getImage: async () => '',
+    updateImage : async () => {},
 });
 
 export const CategoryStateContext = createContext<CategoryState>(initialCategoryState);

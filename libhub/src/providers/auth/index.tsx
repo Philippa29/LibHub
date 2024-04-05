@@ -31,8 +31,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch({ type: 'LOGIN', payload: response.data.result.accessToken });
         console.log('state:', state.authToken);
         localStorage.setItem('authToken', response.data.result.accessToken);
-        message.success('Login successful');
-        push('/dashboard');
+        
+        
       } else {
         throw new Error('Network response was not ok');
       }
@@ -45,13 +45,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } 
     catch (err) {
-      console.error("Login error:", err); 
+      
       if ((err as any).response && (err as any).response.status === 500) {
         // Internal server error occurred
         message.error('Internal server error. Please try again later.');
-      } else {
-        // Other error occurred
-        message.error('An error occurred while logging in');
       }
     }
 

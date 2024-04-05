@@ -31,6 +31,9 @@ const AddBookRequestReducer = (state: BookRequestState, action: Action) => {
                 return {
                     bookId: action.payload.bookId,
                     studentId: action.payload.studentId,
+                    title: action.payload.title,
+                    isbn: action.payload.isbn,
+                    author: action.payload.author,
                 };
             }
             return state;
