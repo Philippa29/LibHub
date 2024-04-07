@@ -10,6 +10,7 @@ const GetAllBookRequestReducer = (state: BookRequests, action: GetAllAction) => 
                 const bookRequests = action.payload.map((bookRequest, index) => {
                     return {
                         ...bookRequest,
+                        id: bookRequest.id,
                         bookId: bookRequest.bookId,
                         studentId: bookRequest.studentId,
                     };
@@ -29,6 +30,7 @@ const AddBookRequestReducer = (state: BookRequestState, action: Action) => {
         case 'ADD_BOOKREQUEST':
             if (action.payload) {
                 return {
+                    id: action.payload.id,
                     bookId: action.payload.bookId,
                     studentId: action.payload.studentId,
                     title: action.payload.title,

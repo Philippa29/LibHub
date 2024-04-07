@@ -1,4 +1,5 @@
 export const initialState: BookRequestState = {
+    id: '',
     bookId: '',
     studentId: '',
     title: '', 
@@ -7,6 +8,7 @@ export const initialState: BookRequestState = {
 };
 
 export interface BookRequestState {
+    id: string,
     bookId: string,
     studentId: string,
     title: string,
@@ -16,11 +18,13 @@ export interface BookRequestState {
 
 export interface BookRequestAction {
     getAllBookRequest: () => Promise<BookRequest[]>;
+    addBookRequest: (bookRequest: BookRequest) => void;
 }
 
 export interface Action {
     type: string;
     payload: {
+        id: string,
         bookId: string,
         studentId: string,
         title: string,
@@ -35,6 +39,7 @@ export interface GetAllAction {
 }
 
 export interface BookRequest {
+    id: string,
     bookId: string,
     studentId: string,
     title: string,

@@ -16,6 +16,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
     const [state, dispatch] = useReducer(addbookreducer, initialState);
     const [allbooksstate , dispatchallbooks] = useReducer(getallbooksreducer, []);
     const [categorystate , categorydispatch] = useReducer(categoryreducer, initialCategoryState);
+    const [allimagesstate , dispatchallimages] = useReducer(getallbooksreducer, []);
     //const [allBooksState , allBooksDispatch] = useReducer(addbookreducer, initialState);
     const categoryState = useCategoryState();
     // const [category, setCategory] = useState<Category>();
@@ -66,6 +67,16 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         }
     }
 
+    const getAvailableBooks = async () => { 
+        try {
+            const response = await axios.get('https://localhost:44311/api/services/app/Book/GetAvailableBooks');
+            console.log(response.data.result);
+            return response.data.result;
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    }
+
     const getImage = async (id: string) => {
         try {
             console.log("id in getImage", id);
@@ -91,6 +102,17 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
             console.error('Error fetching image:', error);
             // Handle errors or return a default image URL
             return ''; // or throw error if you prefer
+        }
+    }
+
+    const getAllImages = async () => {
+        try {
+            const response = await axios.get('https://localhost:44311/api/services/app/StoredFile/GetAllFiles');
+            dispatchallimages({type: 'GET_ALL_IMAGES', payload: response.data.result});
+            console.log(response.data.result);
+            return response.data.result;
+        } catch (error) {
+            console.error('Error fetching images:', error);
         }
     }
 
@@ -224,7 +246,7 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         <CategoryActionsContext.Provider value={{ getCategory }}>
        
         <BookStateContext.Provider value={state } >
-            <BookActionsContext.Provider value={{addBook , getBooks, deleteBook, updateBook,getbookbyid, getImage,updateImage}}>
+            <BookActionsContext.Provider value={{addBook , getBooks, deleteBook, updateBook,getbookbyid, getImage,updateImage, getAllImages,getAvailableBooks}}>
                 {children}
             </BookActionsContext.Provider>
         </BookStateContext.Provider> 

@@ -1,4 +1,4 @@
-import { Action , BookState, CategoryAction, CategoryState, DeleteAction, GetAllAction, getBookbyidstate , GetImageAction} from "./interface";
+import { Action , BookState, CategoryAction, CategoryState, DeleteAction, GetAllAction, getBookbyidstate , GetImageAction, ImageState , allimagesAction} from "./interface";
 
 type Books = BookState[];
   
@@ -71,6 +71,24 @@ const getBookByIdReducer = (state: getBookbyidstate[], action: GetBookByIdAction
       return state;
   }
 };
+
+const getallImagesReducer = (state: ImageState[], action: allimagesAction) => {
+  switch (action.type) {
+    case 'GET_ALL_IMAGES':
+      return [
+        ...state,
+        {
+          id: action.payload.id,
+          fileName: action.payload.fileName,
+          fileType: action.payload.fileType,
+          filePath: action.payload.base64,
+        }
+        
+      ];
+    default:
+      return state;
+  }
+}
 
 
 export interface GetBookByIdState {

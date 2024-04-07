@@ -14,16 +14,38 @@ const BookRequestProvider: React.FC<BookRequestProps> = ({ children }) => {
     const getAllBookRequest = async () => {
         try {
             const response = await axios.get('https://localhost:44311/api/services/app/BookRequest/GetAllBookRequests');
-            console.log("reponse in the provider: " , response);
+            //console.log("reponse in the provider: " , response);
             return response.data.result;
         } catch (error) {
             console.error('Error fetching book requests:', error);
         }
     };
+
+    const addBookRequest = async (bookRequest: any) => {
+        console.log("inside add book request");
+            console.log("bookRequest in the provider: ", bookRequest);
+        try {
+            
+            const response = await axios.post('https://localhost:44311/api/BookRequest/CreateBookRequest', bookRequest, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    'Expires': '0',
+                }
+            });
+            console.log("reponse in the provider: " , response);
+            return response.data.result;
+        } catch (error) {
+            console.error('Error adding book request:', error);
+        }
+    };
+    
     
     return (
         <BookRequestStateContext.Provider value={state}>
-            <BookRequestActionsContext.Provider value={{ getAllBookRequest }}>
+            <BookRequestActionsContext.Provider value={{ getAllBookRequest, addBookRequest }}>
                 {children}
             </BookRequestActionsContext.Provider>
         </BookRequestStateContext.Provider>

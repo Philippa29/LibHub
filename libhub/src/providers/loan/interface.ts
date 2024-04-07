@@ -2,11 +2,11 @@ export const initialState: LoanState = {
     id: '',
     bookRequest : '', 
     book: '',
-    loanDate: new Date(),
-    returnDate: new Date(),
+    loanDate: null,
+    returnDate: null,
     isReturned: false,
     isOverdue: false,
-    actualReturnDate: new Date(),
+    actualReturnDate: null,
     title: '',
     author: '',
     isbn: '',
@@ -35,6 +35,7 @@ export interface LoanAction {
     getLoan: (id: string) => Promise<LoanState>;
     createLoan: (loan: LoanState) => void;
     deleteLoan: (id: string) => void;
+    isReturned: (id: string) => void;
 }
 
 export interface GetAllAction {

@@ -33,6 +33,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
               <meta charSet="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1.0" />
               <title>{metadata.title}</title>
+              <link rel="icon" href="/logo.png" />
               <meta name="description" content={metadata.description} />
             </head>
             <body style={{ margin: 0 }}>{children}</body>

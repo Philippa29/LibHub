@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { BookActions, BookState , CategoryState, CategoryActions, Category, Book} from "./interface";
+import { BookActions, BookState , CategoryState, CategoryActions, Category, Book, ImageState} from "./interface";
 
 // Define types for context values
 
@@ -21,6 +21,14 @@ export const initialCategoryState: CategoryState = {
     name: '',
 }
 
+export const initialImagesState: ImageState = {
+    id: '',
+    fileName : '',
+    fileType: '',
+    base64: '',
+} 
+
+
 
 export const BookStateContext = createContext<BookState>(initialState);
 export const BookActionsContext = createContext<BookActions>({
@@ -31,6 +39,8 @@ export const BookActionsContext = createContext<BookActions>({
     getbookbyid: async () => ({ id: '', author: '', title: '', isbn: '' }),
     getImage: async () => '',
     updateImage : async () => {},
+    getAllImages : async () => [] as ImageState[],
+    getAvailableBooks: async () => [] as Book[],
 });
 
 export const CategoryStateContext = createContext<CategoryState>(initialCategoryState);

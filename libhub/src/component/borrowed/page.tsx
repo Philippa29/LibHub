@@ -1,13 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Table, Button } from 'antd';
+import { Table, Button, message } from 'antd';
 import { useLoanActions } from '@/providers/loan';
 import { LoanState } from '@/providers/loan/interface';
+import { format } from 'date-fns';
 
 const BorrowedBooksPage: React.FC = () => {
   const [loans, setLoans] = useState<LoanState[]>([]);
-
-  const handleReturn = (id: string) => {
+  const { getAllLoans, isReturned } = useLoanActions();
+  const handleReturn = async (id: string) => {
     console.log('Returning book with ID:', id);
+
+    
+      const response = await isReturned(id);
+
+     
+    
+    
+    // Check if isReturned is correctly implemented and called
   };
 
   const columns = [
@@ -35,11 +44,13 @@ const BorrowedBooksPage: React.FC = () => {
       title: 'Loan Date',
       dataIndex: 'loanDate',
       key: 'loanDate',
+      render: (loanDate: Date) => format(new Date(loanDate), 'yyyy-MM-dd HH:mm:ss'),
     },
     {
       title: 'Return Date',
       dataIndex: 'returnDate',
       key: 'returnDate',
+      render: (returnDate: Date) => format(new Date(returnDate), 'yyyy-MM-dd HH:mm:ss'),
     },
     {
       title: 'Overdue',
@@ -64,7 +75,7 @@ const BorrowedBooksPage: React.FC = () => {
     },
   ];
 
-  const { getAllLoans } = useLoanActions();
+  
   //const {loanState , loansDispatch} = useState<LoanState []>([]);
   
   useEffect(() => {
@@ -81,9 +92,9 @@ const BorrowedBooksPage: React.FC = () => {
     fetchLoans();
   }, [getAllLoans]); 
 
-  const data: LoanState[] = loans.map((loan, index) => {
+  const data: LoanState[] = loans?.map((loan, index) => {
     return {
-      id: index.toString(), // You can generate the id dynamically based on index or use another unique identifier
+      id: loan.id, // You can generate the id dynamically based on index or use another unique identifier
       bookRequest: '', // Add the bookRequest property here if it's relevant
       book: '', // Add the book property here if it's relevant
       isReturned: false, // Add the isReturned property here if it's relevant

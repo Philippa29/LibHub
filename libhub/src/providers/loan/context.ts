@@ -1,5 +1,6 @@
 import {createContext} from 'react'; 
 import {LoanState , initialState} from './interface';
+import { isReturned } from './action';
 
 
 
@@ -9,4 +10,5 @@ export const LoanActionsContext = createContext({
     getLoan: async (id: string) => initialState,
     createLoan: async (loan: LoanState) => {},
     deleteLoan: async (id: string) => {},
+    isReturned: async (id: string) => {},
 });

@@ -27,8 +27,6 @@ const links: LinkType[] = [
   { key: "3", label: <Link href="../dashboard/books"> All Books</Link>,  icon: <FileOutlined /> },
   { key: "4", label: <Link href="../dashboard/booksrequest">Book Requests</Link>,  icon: <FileOutlined /> },
   { key: "5", label: <Link href="../dashboard/borrowed">Borrowed Books</Link>,  icon: <FileOutlined /> },
-  { key: "6", label: <Link href="../dashboard/booksrequest">Return Books</Link>,  icon: <FileOutlined /> },
-  { key: "7", label: <Link href="../dashboard/booksrequest">Late Books</Link>,  icon: <FileOutlined /> },
   
 ];
 

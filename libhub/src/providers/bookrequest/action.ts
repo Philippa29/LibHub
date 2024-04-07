@@ -10,3 +10,4 @@ enum ActionTypes{
 
 
 export const createBookRequest = createAction(ActionTypes.CREATE_BOOKREQUEST);
+export const getBookRequest = createAction(ActionTypes.GET_BOOKREQUEST);

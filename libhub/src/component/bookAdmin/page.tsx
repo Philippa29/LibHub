@@ -241,7 +241,7 @@ const ViewModal = (
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Card style={{ width: '60%' }}>
           <Image
-            src={selectedBookImage || "/logo.png"} // Use the selectedBookImage if available, otherwise use a default image
+            src={selectedBookImage } // Use the selectedBookImage if available, otherwise use a default image
             alt="Book Cover"
             width={150}
             height={200}
@@ -252,7 +252,7 @@ const ViewModal = (
             <p>ISBN: {selectedBook.isbn}</p>
             <p>Author: {selectedBook.author}</p>
             <p>Publisher: {selectedBook.publisher}</p>
-            {/* Add other details as needed */}
+           
           </div>
         </Card>
       </div>

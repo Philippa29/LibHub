@@ -7,6 +7,8 @@ import { GetAllBookRequestReducer } from '@/providers/bookrequest/reducer';
 import { getBookbyidstate } from '@/providers/book/interface';
 import { useBookActions } from '@/providers/book';
 import moment from 'moment';
+import { useLoanActions } from '@/providers/loan';
+import { initialState as loanInitialState } from '@/providers/loan/interface';
 
 const BookRequest: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -17,8 +19,9 @@ const BookRequest: React.FC = () => {
   const [selectedBook, setSelectedBook] = useState<BookRequestState | null>(null);
   const [form] = Form.useForm();
   const { getAllBookRequest } = useBookRequestActions();
-  const { getbookbyid } = useBookActions();
-
+  const { createLoan } = useLoanActions();
+  const [loanState, setLoanState] = useState(loanInitialState);
+  
   const columns = [
     {
       title: 'Student ID',
@@ -34,7 +37,6 @@ const BookRequest: React.FC = () => {
           <p>{record.isbn}</p>
         </div>
       ),
-
       key: 'bookDetails',
     },
     {
@@ -51,57 +53,66 @@ const BookRequest: React.FC = () => {
       try {
         const response = await getAllBookRequest();
         setBookRequests(response);
-        
+       
+
       } catch (error) {
         console.error('Error fetching book requests:', error);
       }
     };
 
     fetchData();
-  }, [getAllBookRequest]);
+  });
 
   const formattedData = bookRequests?.map((request: BookRequestState, index: number) => {
-    console.log("request", bookRequests);
+    //console.log("request", bookRequests);
     return {
       key: index.toString(),
       studentId: request.studentId,
       bookId: request.bookId,
-      id: request.bookId,
-      title: request.title, 
+      id: request.id,
+      title: request.title,
       author: request.author,
       isbn: request.isbn,
     };
   });
-  
-  
 
   const handleLoanButtonClick = (record: BookRequestState) => {
     setSelectedBook(record);
-    setStudentId(record.studentId);
     setModalVisible(true);
+    setLoanState({
+      ...loanInitialState,
+      bookRequest: record.id,
+      book: record.bookId,
+    });
   };
-
   const handleCancel = () => {
     setModalVisible(false);
     form.resetFields();
   };
 
   const handleOk = () => {
-    form.validateFields()
-      .then(values => {
-        message.success('Loan request submitted successfully');
+    form
+      .validateFields()
+      .then(async (values) => {
+        
         setModalVisible(false);
         form.resetFields();
+        try {
+          console.log("loanState in handleOk: ", loanState)
+          const response = await createLoan(loanState); // Make sure to pass the correct property name
+          message.success('Loan request submitted successfully');
+        } catch (errorInfo) {
+          console.log('Error creating loan:', errorInfo);
+        }
       })
-      .catch(errorInfo => {
+      .catch((errorInfo) => {
         console.log('Validation failed:', errorInfo);
       });
   };
 
   const today = new Date();
 
-  const disabledDate = (current : any ) => {
-    // Disable dates that have already passed
+  const disabledDate = (current: any) => {
     return current && current < new Date();
   };
 
@@ -110,16 +121,18 @@ const BookRequest: React.FC = () => {
       <h1>Book Request</h1>
       <Table columns={columns} dataSource={formattedData} />
 
-      {/* <Modal
-  title="Loan Book"
-  visible={modalVisible}
-  onCancel={handleCancel}
-  onOk={handleOk}
-  okText="Submit"
-  cancelText="Cancel"
->
-  
-</Modal> */}
+      <Form form={form}>
+      <Modal
+        title="Loan Book"
+        visible={modalVisible}
+        onCancel={handleCancel}
+        onOk={handleOk}
+        okText="Submit"
+        cancelText="Cancel"
+      >
+        <p>Are you sure you want to borrow &quot;{selectedBook?.title}&quot;?</p>
+      </Modal>
+      </Form>
     </div>
   );
 }

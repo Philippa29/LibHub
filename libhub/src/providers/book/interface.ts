@@ -27,7 +27,12 @@ export interface Action {
         file: undefined | string | ArrayBuffer | null;
     }; // Payload is optional, as it's only used for the LOGIN action
 }
-
+export interface ImageState {
+  id: string;
+  fileName : string;
+  fileType: string;
+  base64: string;
+}
 export interface getbookbyidAction {
   type: string;
   payload: {
@@ -47,6 +52,18 @@ export interface DeleteAction{
 
 
 }
+
+export interface allimagesAction{
+  type: string ; 
+  payload: {
+    id: string;
+    fileName : string;
+    fileType: string;
+    base64: string;
+  
+  };
+}
+
 
 
 export interface getBookbyidstate{
@@ -130,6 +147,8 @@ export interface GetImageAction{
     getbookbyid: (id: string) => Promise<getBookbyidstate>;
     getImage: (id: string) => Promise<string>;
     updateImage: (id: string, Image: FormData) => void;
+    getAllImages: () => Promise<ImageState[]>;
+    getAvailableBooks: () => Promise<Book[]>;
   }
 
   export interface CategoryActions {
