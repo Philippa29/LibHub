@@ -239,14 +239,74 @@ const BookProvider: React.FC<BookProviderProps> = ({ children }) => {
         }
     }
 
+    const searchAuthor = async (author: string) : Promise<Book[]> => {
+        console.log("author in searchAuthor", author);
+        try {
+            const response = await axios.get(`https://localhost:44311/api/services/app/GetBookByAuthor/${author}`);
+            console.log("result:", response.data.result);
+            return response.data.result;
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    }
+
+    const searchTitle = async (title: string): Promise<Book[]> => {
+
+        try {
+            const response = await axios.get(`https://localhost:44311/api/services/app/GetBookByTitle/${title}`);
+            return response.data.result;
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    }
+
+    const searchIsbn = async (isbn: string): Promise<Book[]> => {
+        console.log("isbn in searchIsbn", isbn)
+        try {
+            const response = await axios.get(`https://localhost:44311/api/services/app/GetBookByISBN/${isbn}`);
+            return response.data.result;
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    }
+
+    const countBooks = async () => {
+        try {
+            const response = await axios.get('https://localhost:44311/api/services/app/Book/GetBooksCount');
+            return response.data.result;
+        } catch (error) {
+            console.error('Error fetching book count:', error);
+        }
+    }
+
+    const addCategory = async (category: string) => {
+        try {
+            console.log("category in addCategory", category);
+            const response = await axios.post(`https://localhost:44311/api/services/app/Category/CreateCategory?input=${category}`);
+            if (response.data.success) {
+                message.success('Category added successfully');
+                
+            }
+            if (!response.data.success) {
+                throw new Error('Network response was not ok');
+            }
+        } catch (err: any) {
+            if (err.response && err.response.status === 500) {
+                message.error('Internal Server Error: Please try again later');
+            } else {
+                message.error('An error occurred while adding category');
+            }
+        }
+    }
+
     
 
     return (
         <CategoryStateContext.Provider value={categorystate}>
-        <CategoryActionsContext.Provider value={{ getCategory }}>
+        <CategoryActionsContext.Provider value={{ getCategory , addCategory}}>
        
         <BookStateContext.Provider value={state } >
-            <BookActionsContext.Provider value={{addBook , getBooks, deleteBook, updateBook,getbookbyid, getImage,updateImage, getAllImages,getAvailableBooks}}>
+            <BookActionsContext.Provider value={{addBook , getBooks, deleteBook, updateBook,getbookbyid, getImage,updateImage, getAllImages,getAvailableBooks, searchAuthor, searchIsbn, searchTitle, countBooks}}>
                 {children}
             </BookActionsContext.Provider>
         </BookStateContext.Provider> 

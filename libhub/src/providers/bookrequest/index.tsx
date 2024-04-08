@@ -41,11 +41,20 @@ const BookRequestProvider: React.FC<BookRequestProps> = ({ children }) => {
             console.error('Error adding book request:', error);
         }
     };
+
+    const countBookRequest = async () => {
+        try {
+            const response = await axios.get('https://localhost:44311/api/services/app/BookRequest/GetBookRequestCount');
+            return response.data.result;
+        } catch (error) {
+            console.error('Error fetching book request count:', error);
+        }
+    }
     
     
     return (
         <BookRequestStateContext.Provider value={state}>
-            <BookRequestActionsContext.Provider value={{ getAllBookRequest, addBookRequest }}>
+            <BookRequestActionsContext.Provider value={{ getAllBookRequest, addBookRequest , countBookRequest}}>
                 {children}
             </BookRequestActionsContext.Provider>
         </BookRequestStateContext.Provider>

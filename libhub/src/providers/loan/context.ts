@@ -11,4 +11,5 @@ export const LoanActionsContext = createContext({
     createLoan: async (loan: LoanState) => {},
     deleteLoan: async (id: string) => {},
     isReturned: async (id: string) => {},
+    loanCount: async () => 0,
 });

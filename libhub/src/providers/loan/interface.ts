@@ -36,6 +36,7 @@ export interface LoanAction {
     createLoan: (loan: LoanState) => void;
     deleteLoan: (id: string) => void;
     isReturned: (id: string) => void;
+    loanCount: () => Promise<number>;
 }
 
 export interface GetAllAction {
@@ -46,4 +47,9 @@ export interface GetAllAction {
 export interface Action {
     type: string;
     payload: LoanState; 
+}
+
+export interface LoanCount {
+    type: string;
+    payload: number;
 }

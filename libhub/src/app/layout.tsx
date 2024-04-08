@@ -2,6 +2,7 @@
 import { BookProvider } from "@/providers/book/index";
 import { BookRequestProvider } from "@/providers/bookrequest";
 import { LoanProvider } from "@/providers/loan";
+import { UserProvider } from "@/providers/users";
 import dynamic from "next/dynamic"; 
 import { Suspense } from "react";
 
@@ -24,7 +25,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 
    
 
-
+    <UserProvider>
     <LoanProvider>
       <BookRequestProvider>
         <BookProvider>
@@ -42,6 +43,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         </BookProvider>
       </BookRequestProvider>
     </LoanProvider>
+    </UserProvider>
   );
 }
 

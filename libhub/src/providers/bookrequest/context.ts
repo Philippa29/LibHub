@@ -16,6 +16,7 @@ export const BookRequestStateContext = createContext<BookRequestState>(initialSt
 export const BookRequestActionsContext = createContext<BookRequestAction>({
     getAllBookRequest: async () => [] as BookRequest[],
     addBookRequest: async () => {},
+    countBookRequest: async () => 0,
 
 });
 

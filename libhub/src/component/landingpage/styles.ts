@@ -2,8 +2,9 @@ import { createStyles } from "antd-style";
 
 export const landingstyles = createStyles(({ css }) => ({
     card: css`
-        width: 150px;
+        width: 500px;
         margin: 10px;
+        colour: red; 
     `,
     
     loading: css`
@@ -14,15 +15,13 @@ export const landingstyles = createStyles(({ css }) => ({
         flex-direction: column; 
     `,
     container: css`
-    display: flex; 
-    flex-direction: column; /* Ensure content is stacked vertically */
-    align-items: center; /* Center items horizontally */
-    justify-content: center; /* Center items vertically */
-    width: 200px; 
-    padding-right: 15px;
+    
+    background-color: #e4e2e6;
+     
     `,
     titles : css`
         text-align: center; 
         padding: 10px; 
+        colour: #dc5cd4;
     `,
 }));

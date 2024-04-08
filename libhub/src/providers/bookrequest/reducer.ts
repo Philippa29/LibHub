@@ -1,4 +1,4 @@
-import {BookRequestState, Action, GetAllAction } from './interface';
+import {BookRequestState, Action, GetAllAction , BookRequestCount} from './interface';
 
 
 type BookRequests = BookRequestState[];
@@ -44,9 +44,18 @@ const AddBookRequestReducer = (state: BookRequestState, action: Action) => {
     }
 }
 
+const BookRequestCountReducer = (state: number, action: BookRequestCount) => {
+    switch (action.type) {
+        case 'BOOKREQUEST_COUNT':
+            return action.payload;
+        default:
+            return state;
+    }
+}
 
 
 
 
-export {GetAllBookRequestReducer, AddBookRequestReducer}
+
+export {GetAllBookRequestReducer, AddBookRequestReducer, BookRequestCountReducer}
 

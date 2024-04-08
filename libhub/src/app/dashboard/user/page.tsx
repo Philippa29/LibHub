@@ -1,29 +1,42 @@
-'use client'; 
-import React, { useState } from 'react';
+'use client'
+import React, { useState , useContext , useEffect } from 'react';
 import { Input, Table } from 'antd';
-
-// Dummy user data
-const dummyUsers = [
-  { id: 1, name: 'John Doe', email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-  { id: 3, name: 'Bob Johnson', email: 'bob@example.com' },
-];
+import { useUserState, useUserActions } from '../../../providers/users';
+import { UserState } from '../../../providers/users/interface';
+import { userComponentStyles } from './style';
 
 const UserComponent: React.FC = () => {
   // State for search input value
   const [searchValue, setSearchValue] = useState('');
+  const users = useUserState();
+  const { getUser } = useUserActions();
+  const [userData, setUserData] = useState<UserState[]>([]);
 
-  // Filtered user data based on search input
-  const filteredUsers = dummyUsers.filter(user =>
+  useEffect(() => {
+    //console.log('Fetching users');
+    const fetchData = async () => {
+      try {
+        console.log('Fetching users')
+        const response = await getUser();
+        console.log('response:', response);
+        setUserData(response);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const filteredUsers = userData.filter(user =>
     user.name.toLowerCase().includes(searchValue.toLowerCase())
   );
 
   // Columns for Ant Design Table
   const columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      title: 'Student ID',
+      dataIndex: 'studentID',
+      key: 'StudentID',
     },
     {
       title: 'Name',
@@ -32,26 +45,26 @@ const UserComponent: React.FC = () => {
     },
     {
       title: 'Email',
-      dataIndex: 'email',
+      dataIndex: 'emailAddress',
       key: 'email',
     },
   ];
 
+  const { styles } = userComponentStyles();
+
   return (
-    <div>
-      
-      {/* Ant Design Search component */}
+    <div className={styles.container}>
       <Input.Search
         placeholder="Search users"
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
-        style={{ marginBottom: '16px' }}
+        className={styles.searchInput}
       />
-      {/* Ant Design Table to display user data */}
-      <Table dataSource={filteredUsers} columns={columns} />
+      <div className={styles.tableContainer}>
+        <Table dataSource={filteredUsers} columns={columns} className={styles.table} />
+      </div>
     </div>
   );
 };
 
 export default UserComponent;
-

@@ -9,6 +9,7 @@ import { useBookActions } from '@/providers/book';
 import moment from 'moment';
 import { useLoanActions } from '@/providers/loan';
 import { initialState as loanInitialState } from '@/providers/loan/interface';
+import WithAuth from '../../providers/auth/requireauth';
 
 const BookRequest: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -21,6 +22,7 @@ const BookRequest: React.FC = () => {
   const { getAllBookRequest } = useBookRequestActions();
   const { createLoan } = useLoanActions();
   const [loanState, setLoanState] = useState(loanInitialState);
+  const [searchValue, setSearchValue] = useState<string>(''); 
   
   const columns = [
     {
@@ -85,6 +87,12 @@ const BookRequest: React.FC = () => {
       book: record.bookId,
     });
   };
+
+  const filteredData = formattedData?.filter((request: BookRequestState) =>
+    request.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+    request.author.toLowerCase().includes(searchValue.toLowerCase()) ||
+    request.isbn.toLowerCase().includes(searchValue.toLowerCase())
+  );
   const handleCancel = () => {
     setModalVisible(false);
     form.resetFields();
@@ -99,8 +107,9 @@ const BookRequest: React.FC = () => {
         form.resetFields();
         try {
           console.log("loanState in handleOk: ", loanState)
-          const response = await createLoan(loanState); // Make sure to pass the correct property name
-          message.success('Loan request submitted successfully');
+          const response = await createLoan(loanState);
+           // Make sure to pass the correct property name
+          message.error('Loan request submitted unsuccessfully');
         } catch (errorInfo) {
           console.log('Error creating loan:', errorInfo);
         }
@@ -108,6 +117,10 @@ const BookRequest: React.FC = () => {
       .catch((errorInfo) => {
         console.log('Validation failed:', errorInfo);
       });
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchValue(value); // Update the search query state
   };
 
   const today = new Date();
@@ -118,8 +131,9 @@ const BookRequest: React.FC = () => {
 
   return (
     <div>
-      <h1>Book Request</h1>
-      <Table columns={columns} dataSource={formattedData} />
+      
+      <Input.Search placeholder="Search book requests" value={searchValue} onChange={(e) => handleSearch(e.target.value)} style={{ marginBottom: '16px', marginTop: '16px' }}/>
+      <Table columns={columns} dataSource={filteredData} />
 
       <Form form={form}>
       <Modal
@@ -137,4 +151,4 @@ const BookRequest: React.FC = () => {
   );
 }
 
-export default BookRequest;
+export default WithAuth(BookRequest);

@@ -47,6 +47,10 @@ const addbookreducer = (state: BookState , action: Action ) => {
 
 };
 
+interface SearchState {
+  books: BookState[];
+}
+
 const getBookByIdInitialState: GetBookByIdState = {
   author: '',
   title: '',
@@ -89,6 +93,41 @@ const getallImagesReducer = (state: ImageState[], action: allimagesAction) => {
       return state;
   }
 }
+
+const searchReducer = (state: Books, action: GetAllAction)=> {
+  switch (action.type) {
+    case 'SEARCH_AUTHOR':
+      const booksByAuthor = action.payload.map((book, index) => {
+        return {
+          ...book,
+          BookId: book.bookId // Assigning 'bookId' to the 'id' property
+        };
+      });
+      return { ...state, books: booksByAuthor };
+
+    case 'SEARCH_TITLE':
+      const booksByTitle = action.payload.map((book, index) => {
+        return {
+          ...book,
+          BookId: book.bookId // Assigning 'bookId' to the 'id' property
+        };
+      });
+      return { ...state, books: booksByTitle };
+
+    case 'SEARCH_ISBN':
+      const booksByISBN = action.payload.map((book, index) => {
+        return {
+          ...book,
+          BookId: book.bookId // Assigning 'bookId' to the 'id' property
+        };
+      });
+      return { ...state, books: booksByISBN };
+
+    default:
+      return state;
+  }
+};
+
 
 
 export interface GetBookByIdState {
@@ -149,8 +188,6 @@ const getallbooksreducer = (state: Books, action: GetAllAction) => {
   switch (action.type) {
       case 'GET_ALL_BOOKS':
           if (action.payload) {
-              console.log("action.payload in get_book", action.payload);
-              console.log("state in getBook", state);
               const booksWithId = action.payload.map((book, index) => {
                   return {
                       ...book,
@@ -182,6 +219,15 @@ const categoryreducer = (state: CategoryState , action: CategoryAction) => {
         }
         console.log("state in getBook", state);
         return state;
+
+      case 'ADD_CATEGORY':
+        if (action.payload) {
+            return {
+                ...state,
+              id: action.payload.id,
+              name: action.payload.name,
+            };
+        }
     
 
         default:
@@ -189,4 +235,4 @@ const categoryreducer = (state: CategoryState , action: CategoryAction) => {
     }
 } 
 
-export {addbookreducer , categoryreducer, getallbooksreducer, deleteBookreducer,getBookByIdReducer,getImageReducer,updateImageReducer};
+export {addbookreducer , categoryreducer, getallbooksreducer, deleteBookreducer,getBookByIdReducer,getImageReducer,updateImageReducer, searchReducer, getallImagesReducer, getBookByIdInitialState};

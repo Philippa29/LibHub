@@ -5,13 +5,8 @@ import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined 
 import { useCategoryActions, useBookActions } from '@/providers/book';
 import { message } from 'antd';
 import { Book } from '@/providers/book/interface';
-import { useRouter } from 'next/navigation';
-import { useBookRequestState, useBookRequestActions } from '@/providers/bookrequest';
-import { BookRequestState } from '@/providers/bookrequest/interface';
-import { getallbooksreducer } from '@/providers/book/reducer';
-import { GetAllBookRequestReducer } from '@/providers/bookrequest/reducer';
-import RequireAuth from '@/providers/auth/requireauth';
-import { updateBook } from '@/providers/book/action';
+import { bookComponentStyles } from './styles/style';
+import WithAuth from '../../providers/auth/requireauth';
 
 
 
@@ -31,27 +26,30 @@ enum BookStatus {
 
 
 const BookComponent: React.FC = () => {
-  const route = useRouter();
+  
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [allbooks , setallbooks ] = useState<Book[]>([]); // Add this line
   const [searchValue, setSearchValue] = useState('');
   const [selectedBookImage, setSelectedBookImage] = useState<string | null>(null);
-  
+  const [isAddCategoryModalVisible, setIsAddCategoryModalVisible] = useState(false);
+
   const {getCategory} = useCategoryActions();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedBookForEdit, setSelectedBookForEdit] = useState<Book | null>(null);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false); // State for Add modal
 
   const {addBook, getBooks, deleteBook, getImage, updateBook} = useBookActions();
+  const { addCategory } = useCategoryActions();
 
-  
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [deleteBookstate, setDeleteBookstate] = useState<Book | null>(null);
+
   const isEditable = true; 
   const showDeleteModal = (book: Book) => {
     setDeleteBookstate(book);
@@ -82,7 +80,8 @@ const BookComponent: React.FC = () => {
         //console.log('response:', response); // Log the entire response for debugging
         if (response && Array.isArray(response)) {
           
-          setCategories(response.map((category: { id: string; name: string }) => ({ id: category.id, name: category.name })));
+          setCategories(response.map((category: Category) => ({ id: category.id, name: category.name })));
+
         } else {
           console.error('Invalid response format:', response);
         }
@@ -94,9 +93,13 @@ const BookComponent: React.FC = () => {
   
     fetchCategories();
 
-    
+    //show me the interface...hello of what? of ook 
     
   }, []);
+
+  useEffect(() => {
+    setFilteredBooks(allbooks); // Initially, display all books
+  }, [allbooks]);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -139,15 +142,33 @@ const BookComponent: React.FC = () => {
     console.log('selectedBookForEdit in show:', selectedBookForEdit);
     //form.setFieldsValue({ categoryID: undefined }); // Reset category field value in the form
   };
+
+  const showAddCategoryModal = () => {
+    setIsAddCategoryModalVisible(true);
+  };
   
 
 
-  const handleBeforeUpload = (file: File, fileList: File[]) => { // Explicitly type the parameters
+  const handleBeforeUpload = (file: File, fileList: File[]) => { 
+    // Explicitly type the parameters
     if (fileList.length > 1) {
       message.error('You can only upload one image.');
       return false; // Prevent uploading
     }
     return true; // Allow uploading
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchValue(value); // Update the search query state
+  
+    // Filter the books based on the search query
+    const filtered = allbooks.filter(book =>
+      book.title.toLowerCase().includes(value.toLowerCase()) ||
+      book.isbn.toLowerCase().includes(value.toLowerCase()) ||
+      book.author.toLowerCase().includes(value.toLowerCase()) ||
+      book.publisher.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredBooks(filtered); // Update the filtered books state
   };
   
 
@@ -228,6 +249,15 @@ const handleView = async (book: Book) => {
       console.error('Error fetching image:', error);
       // Handle error if necessary
   }
+};
+
+const handleAddCategory = async (values: any) => {
+  
+  console.log('Adding category:', values.name);
+  const response = await addCategory(values.name.toString()); 
+  console.log('response:', response);
+  setIsAddCategoryModalVisible(false);
+  form.resetFields();
 };
 
 const ViewModal = (
@@ -352,37 +382,67 @@ const ViewModal = (
       ),
     },
   ];
-  
+
+  const handleCancelAddCategory = () => {
+    setIsAddCategoryModalVisible(false);
+    form.resetFields();
+  };
+
 
   
+
+  const { styles } = bookComponentStyles();
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
     <div>
 
-      <Input.Search
-        placeholder="Search books"
-        value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
-        style={{ marginBottom: '16px' , marginTop : '16px'}}
-      />
-      <Table dataSource={allbooks} columns={columns} /> 
-      <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+    <Input.Search placeholder="Search books" value={searchValue} onChange={(e) => handleSearch(e.target.value)} style={{ marginBottom: '16px', marginTop: '16px' }}/>
+      
+      <Table dataSource={filteredBooks} columns={columns} />
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+      <Button type="primary" icon={<PlusOutlined />} onClick={showModal} style={{ marginRight: '10px' }}>
         Add Book
       </Button>
-      <Button type="primary" icon={<PlusOutlined />} onClick={showModal} style={{ marginLeft: '10px' }}>
-  Add Category
-</Button>
-      <Modal 
-      title="Add Book" 
-      open={isModalVisible} // Use "visible" instead of "open"
-      onCancel={() => {
-      handleCancel();
-      form.resetFields();
-      }}
-      okText="Add Book"
-      onOk={form.submit}
-      >
+      <Button type="primary" icon={<PlusOutlined />} onClick={showAddCategoryModal}>
+        Add Category
+      </Button>
+      </div>
+
+
+        <Modal
+          title="Add Category"
+          visible={isAddCategoryModalVisible}
+          onCancel={handleCancelAddCategory}
+          footer={[
+            <Button key="cancel" onClick={handleCancelAddCategory}>
+              Cancel
+            </Button>,
+            <Button key="add" type="primary" onClick={form.submit}>
+              Add Category
+            </Button>,
+          ]}
+        >
+          <Form form={form} onFinish={handleAddCategory}>
+            <Form.Item
+              name="name"
+              label="Category Name"
+              rules={[{ required: true, message: 'Please enter the category name' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Form>
+        </Modal>
+        <Modal
+          title="Add Book"
+          visible={isModalVisible}
+          onCancel={() => {
+            handleCancel();
+            form.resetFields();
+          }}
+          okText="Add Book"
+          onOk={form.submit}
+        >
         <Form
           form={form}
           onFinish={onFinish}
@@ -411,14 +471,15 @@ const ViewModal = (
           <Input onChange={(e) => setBook({ ...book, publisher: e.target.value })} />
         </Form.Item>
         <Form.Item name="categoryID" label="Category" rules={[{ required: true }]}>
-          <Select onChange={(value) => setBook({ ...book, categoryID: value })} value={book.categoryID}>
-                      {categories.map(category => (
-          <Select.Option key={category.id} value={category.id}>
-                        { category.name}
-          </Select.Option>
-                  ))}
-          </Select>
+        <Select onChange={(value) => setBook({ ...book, categoryID: value })} value={book.categoryID}>
+        {categories.map(category => (
+        <Select.Option key={category.id} value={category.id}>
+        {category.name}
+        </Select.Option>
+          ))}
+        </Select>
       </Form.Item>
+
       <Form.Item name="bookCondition" label="Book Condition" rules={[{ required: true }]}>
           <Select onChange={(value) => setBook({ ...book, bookCondition: value })} value={book.bookCondition}>
             <Select.Option value={BookCondition.Lost}>Lost</Select.Option>
@@ -434,39 +495,35 @@ const ViewModal = (
         </Select>
     </Form.Item>
         <Form.Item name="image" label="Upload Image">
-        <Upload
-          showUploadList={true}
-          beforeUpload={handleBeforeUpload}
-          maxCount={1} // Limit the number of files to 1
-        >
+        <Upload>
         <Button icon={<UploadOutlined />}>Click to Upload</Button>
    </Upload>
 </Form.Item>
         </Form>
       </Modal>
-      <Modal 
-  title="Edit Book" 
-  open={isEditModalVisible} // Use "visible" instead of "open"
-  onCancel={() => {
-    setIsEditModalVisible(false);
-    form.resetFields();
-    setSelectedBookForEdit(null);
-  }}
-  okText="Save Changes"
-  onOk={form.submit}
->
-  <Form
-    form={form}
-    onFinish={onFinishUpdate}
-    initialValues={selectedBookForEdit ? { ...selectedBookForEdit } : undefined}
-    onValuesChange={(changedValues, allValues) => {
-      setSelectedBookForEdit(prevState => ({
-        ...prevState,
-        ...changedValues
-      }));
-    }}
-    key={selectedBookForEdit?.bookId}
-  >
+      <Modal
+          title="Edit Book"
+          visible={isEditModalVisible}
+          onCancel={() => {
+            setIsEditModalVisible(false);
+            form.resetFields();
+            setSelectedBookForEdit(null);
+          }}
+          okText="Save Changes"
+          onOk={form.submit}
+        >
+   <Form
+            form={form}
+            onFinish={onFinishUpdate}
+            initialValues={selectedBookForEdit ? { ...selectedBookForEdit } : undefined}
+            onValuesChange={(changedValues, allValues) => {
+              setSelectedBookForEdit((prevState) => ({
+                ...prevState,
+                ...changedValues,
+              }));
+            }}
+            key={selectedBookForEdit?.bookId}
+          >
     <Form.Item name="title" label="Title" rules={[{ required: true }]}>
       <Input disabled={!isEditable} />
     </Form.Item>
@@ -497,7 +554,7 @@ const ViewModal = (
       <Upload
         showUploadList={true}
         beforeUpload={handleBeforeUpload}
-        maxCount={1} // Limit the number of files to 1
+       // maxCount={1} // Limit the number of files to 1
       >
         <Button icon={<UploadOutlined />}>Click to Upload</Button>
       </Upload>
@@ -528,4 +585,4 @@ const ViewModal = (
   );
 };
 
-export default BookComponent;
+export default WithAuth(BookComponent);

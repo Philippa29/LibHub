@@ -1,4 +1,4 @@
-import { LoanState , Action , GetAllAction } from "./interface";
+import { LoanState , Action , GetAllAction, LoanCount } from "./interface";
 
 
 type Loans = LoanState[];
@@ -43,4 +43,13 @@ const AddLoanReducer = (state: LoanState, action: Action) => {
     }
 }
 
-export {GetAllLoansReducer, AddLoanReducer}
+const LoanCountReducer = (state: number, action: LoanCount) => {
+    switch (action.type) {
+        case 'LOAN_COUNT':
+            return action.payload;
+        default:
+            return state;
+    }
+}
+
+export {GetAllLoansReducer, AddLoanReducer, LoanCountReducer}

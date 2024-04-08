@@ -37,15 +37,22 @@ export const BookActionsContext = createContext<BookActions>({
     deleteBook: async () => {},
     updateBook: async () => {}, 
     getbookbyid: async () => ({ id: '', author: '', title: '', isbn: '' }),
+    countBooks: async () => 0,
     getImage: async () => '',
     updateImage : async () => {},
     getAllImages : async () => [] as ImageState[],
     getAvailableBooks: async () => [] as Book[],
+    searchAuthor: async () => [] as Book[],
+    searchTitle: async () => [] as Book[],
+    searchIsbn: async () => [] as Book[],
+    
+
 });
 
 export const CategoryStateContext = createContext<CategoryState>(initialCategoryState);
 export const CategoryActionsContext = createContext<CategoryActions>({
     getCategory: async () => [] as Category[], // Adjust the return type
+    addCategory: async () => {},
 });
 
 //export { BookStateContext, BookActionsContext, initialState };

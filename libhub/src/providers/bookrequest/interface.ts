@@ -19,6 +19,7 @@ export interface BookRequestState {
 export interface BookRequestAction {
     getAllBookRequest: () => Promise<BookRequest[]>;
     addBookRequest: (bookRequest: BookRequest) => void;
+    countBookRequest: () => Promise<number>;
 }
 
 export interface Action {
@@ -45,4 +46,9 @@ export interface BookRequest {
     title: string,
     author: string,
     isbn: string,
+}
+
+export interface BookRequestCount {
+    type: string;
+    payload: number;
 }

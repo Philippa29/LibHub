@@ -15,15 +15,15 @@ import Link from "next/link";
 const { Sider } = Layout;
 const { Item: MenuItem } = Menu;
 
-interface LinkType {
+export interface LinkType {
   key: string;
   label: JSX.Element;
   icon: JSX.Element; // Specify the icon type
 }
 
 const links: LinkType[] = [
-  { key: "1", label: <Link href="../dashboard/user">User</Link>, icon: <UserOutlined /> },
-  { key: "2", label: <Link href="../dashboard/meetingroom">Meeting Room</Link>, icon: <TeamOutlined /> },
+  { key: "1", label: <Link href="../dashboard">Home</Link>, icon: <UserOutlined /> },
+  { key: "2", label: <Link href="../dashboard/user">User</Link>, icon: <UserOutlined /> },
   { key: "3", label: <Link href="../dashboard/books"> All Books</Link>,  icon: <FileOutlined /> },
   { key: "4", label: <Link href="../dashboard/booksrequest">Book Requests</Link>,  icon: <FileOutlined /> },
   { key: "5", label: <Link href="../dashboard/borrowed">Borrowed Books</Link>,  icon: <FileOutlined /> },

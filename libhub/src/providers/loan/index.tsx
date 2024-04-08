@@ -105,6 +105,16 @@ const LoanProvider: React.FC<LoanProps> = ({ children }) => {
             console.error('Error checking if loan is returned:', error);
         }
     };
+
+    const loanCount = async () => {
+        try {
+            const response = await axios.get('https://localhost:44311/api/services/app/Loan/GetLoanCount');
+            console.log("reponse in the provider: ", response);
+            return response.data.result;
+        } catch (error) {
+            console.error('Error fetching loan count:', error);
+        }
+    };
     
     
 
@@ -112,7 +122,7 @@ const LoanProvider: React.FC<LoanProps> = ({ children }) => {
 
     return (
         <LoanStateContext.Provider value={state}>
-            <LoanActionsContext.Provider value={{ getAllLoans, createLoan , deleteLoan , getLoan, isReturned}}>
+            <LoanActionsContext.Provider value={{ getAllLoans, createLoan , deleteLoan , getLoan, isReturned, loanCount}}>
                 {children}
             </LoanActionsContext.Provider>
         </LoanStateContext.Provider>

@@ -145,12 +145,17 @@ export interface GetImageAction{
     deleteBook: (id: string) => void;
     updateBook: (Book: FormData , Image: FormData) => void; 
     getbookbyid: (id: string) => Promise<getBookbyidstate>;
+    countBooks: () => Promise<number>;
     getImage: (id: string) => Promise<string>;
     updateImage: (id: string, Image: FormData) => void;
     getAllImages: () => Promise<ImageState[]>;
     getAvailableBooks: () => Promise<Book[]>;
+    searchAuthor: (author: string) => Promise<Book[]>;
+    searchTitle: (title: string) => Promise<Book[]>;
+    searchIsbn: (isbn: string) => Promise<Book[]>;
   }
 
   export interface CategoryActions {
     getCategory: () => Promise<Category[]>;
+    addCategory: (Category: string) => void;
   }
