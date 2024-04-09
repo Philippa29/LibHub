@@ -9,8 +9,7 @@ your libbary network
 rary network
 ![Screenshot 2024-04-09 092745](https://github.com/Philippa29/LibHub/assets/68788485/ca6463c7-16fc-40dc-b8cf-db47edcf7ee4)
 
-![Screenshot 2024-03-22 155357](https://github.com/Philippa29/LibHub/assets/68788485/b4c2f8ad-68ca-457d-b414-394d580a6e9a)
-admin side 
+
 ![Screenshot 2024-04-09 091822](https://github.com/Philippa29/LibHub/assets/68788485/9d4fbe16-8f6a-4499-b830-35b47686b509)
 
 ![Screenshot 2024-04-09 092111](https://github.com/Philippa29/LibHub/assets/68788485/77f975ae-ec2a-4ece-a4b8-d181046824fb)
