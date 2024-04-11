@@ -1,61 +1,68 @@
-import {BookRequestState, Action, GetAllAction , BookRequestCount} from './interface';
+import { Action, GetAllAction, BookRequestCount } from './interface';
+import { handleActions } from 'redux-actions';
+import { IBookRequest, initialBookRequestState } from './context';
+import { ActionTypes } from './action';
 
 
-type BookRequests = BookRequestState[];
-const GetAllBookRequestReducer = (state: BookRequests, action: GetAllAction) => {
-    switch (action.type) {
-        case 'GET_BOOKREQUEST':
+const BookRequestReducer = handleActions<IBookRequest, any>(
+    {
+        [ActionTypes.CREATE_BOOKREQUEST]: (state, action) => {
             if (action.payload) {
-                console.log("action.payload for book request", action.payload)
-                const bookRequests = action.payload.map((bookRequest, index) => {
+                // Check if the book request already exists in the state
+                const existingBookRequest = state.bookRequests.find(bookRequest => bookRequest.id === action.payload.id);
+                
+                // If the book request doesn't already exist, append it to the array
+                if (!existingBookRequest) {
                     return {
-                        ...bookRequest,
-                        id: bookRequest.id,
-                        bookId: bookRequest.bookId,
-                        studentId: bookRequest.studentId,
+                        
+                        bookRequests: [...state.bookRequests, action.payload], // Append the new book request to the existing array of book requests
                     };
-                });
-                return [...bookRequests];
+                }
             }
-            // Return the current state if the payload is falsy or not provided
             return state;
-        // Add a default case to return the current state if the action type is unknown
-        default:
-            return state;
-    }
-};
-
-const AddBookRequestReducer = (state: BookRequestState, action: Action) => {
-    switch (action.type) {
-        case 'ADD_BOOKREQUEST':
+        },
+        
+        [ActionTypes.GET_BOOKREQUEST]: (state, action) => {
+            console.log("State", state);
             if (action.payload) {
-                return {
-                    id: action.payload.id,
-                    bookId: action.payload.bookId,
-                    studentId: action.payload.studentId,
-                    title: action.payload.title,
-                    isbn: action.payload.isbn,
-                    author: action.payload.author,
-                };
+                // Check if the book request with the same ID already exists in the state
+                const existingRequestIndex = state.bookRequests.findIndex(request => request.bookId === action.payload.id);
+                
+                // If the book request doesn't already exist, update the bookRequests array with the payload from the action
+                if (existingRequestIndex === -1) {
+                    return {
+                        ...state, 
+                        bookRequests: action.payload, // Update the bookRequests array with the payload from the action
+                    };
+                }
             }
             return state;
-        default:
-            return state;
-    }
-}
+        },
+        
+    [ActionTypes.UPDATE_BOOKREQUEST]: (state, action) => {
+        console.log("state in update: ",state,"bookrequest UPDATE",action.payload)
+        if (action.payload) {
+          const updatedBookRequests = state.bookRequests.filter(bookRequest => {
+            console.log("bookRequest",bookRequest)
+            return  bookRequest.id !== action.payload
+          }
+           
+          
+          );
+          return {
+            ...state,
+            bookRequests: updatedBookRequests, // Update the array of book requests after filtering out the matching one
+          };
+        }
+        return state;
+      },
+    [ActionTypes.BOOKREQUEST_COUNT]: (state, action) => {
+        if (action.payload) {
+            return { ...state, count: action.payload }; // Set the count of book requests
+        }
+        return state;
+    },
 
-const BookRequestCountReducer = (state: number, action: BookRequestCount) => {
-    switch (action.type) {
-        case 'BOOKREQUEST_COUNT':
-            return action.payload;
-        default:
-            return state;
-    }
-}
+}, initialBookRequestState );
 
-
-
-
-
-export {GetAllBookRequestReducer, AddBookRequestReducer, BookRequestCountReducer}
-
+export {BookRequestReducer}

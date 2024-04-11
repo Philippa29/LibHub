@@ -14,19 +14,26 @@ export const  initialState: BookState = {
 }
   
 export interface Action {
-    type: string;
-    payload: {
-      id: string;
-        title: string;
-        isbn: string;
-        author: string;
-        publisher: string;
-        categoryID: string;
-        bookStatus: number;
-        bookCondition: number;
-        file: undefined | string | ArrayBuffer | null;
-    }; // Payload is optional, as it's only used for the LOGIN action
+  type: string;
+  payload: SingleItemPayload | ArrayPayload; // Union type
 }
+
+export interface SingleItemPayload {
+  id: string;
+  title: string;
+  isbn: string;
+  author: string;
+  publisher: string;
+  categoryID: string;
+  bookStatus: number;
+  bookCondition: number;
+  file: undefined | string | ArrayBuffer | null;
+}
+
+export interface ArrayPayload {
+  items: SingleItemPayload[];
+}
+
 export interface ImageState {
   id: string;
   fileName : string;
@@ -53,16 +60,6 @@ export interface DeleteAction{
 
 }
 
-export interface allimagesAction{
-  type: string ; 
-  payload: {
-    id: string;
-    fileName : string;
-    fileType: string;
-    base64: string;
-  
-  };
-}
 
 
 
@@ -90,7 +87,7 @@ export interface CategoryAction {
 }
 
 export interface BookState {
-  bookId: string; // Change to lowercase 'bookId'
+  bookId: string; 
   title: string;
   isbn: string;
   author: string;
@@ -141,21 +138,14 @@ export interface GetImageAction{
   
   export interface BookActions {
     addBook: (Book: FormData) => void;
-    getBooks: () => Promise<Book[]>;
+    getBooks: () => void;
     deleteBook: (id: string) => void;
     updateBook: (Book: FormData , Image: FormData) => void; 
     getbookbyid: (id: string) => Promise<getBookbyidstate>;
     countBooks: () => Promise<number>;
-    getImage: (id: string) => Promise<string>;
     updateImage: (id: string, Image: FormData) => void;
-    getAllImages: () => Promise<ImageState[]>;
-    getAvailableBooks: () => Promise<Book[]>;
-    searchAuthor: (author: string) => Promise<Book[]>;
-    searchTitle: (title: string) => Promise<Book[]>;
-    searchIsbn: (isbn: string) => Promise<Book[]>;
+    getAvailableBooks: () => void;
+    search: (searchTerm: string) => Promise<Book[]>
   }
 
-  export interface CategoryActions {
-    getCategory: () => Promise<Category[]>;
-    addCategory: (Category: string) => void;
-  }
+

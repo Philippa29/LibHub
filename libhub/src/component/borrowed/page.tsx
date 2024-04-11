@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, message , Input} from 'antd';
-import { useLoanActions } from '@/providers/loan';
+import { useLoanActions, useLoanState } from '@/providers/loan';
 import { LoanState } from '@/providers/loan/interface';
 import { format } from 'date-fns';
 import WithAuth from '../../providers/auth/requireauth';
 
 const BorrowedBooksPage: React.FC = () => {
-  const [loans, setLoans] = useState<LoanState[]>([]);
+  const {loans} = useLoanState();
+   
   const { getAllLoans, isReturned } = useLoanActions();
   const [searchValue, setSearchValue] = useState<string>('');
   const handleReturn = async (id: string) => {
@@ -81,30 +82,14 @@ const BorrowedBooksPage: React.FC = () => {
   //const {loanState , loansDispatch} = useState<LoanState []>([]);
   
   useEffect(() => {
-    const fetchLoans = async () => {
-      try {
-        const loans = await getAllLoans(); // Check if getAllLoans is correctly implemented and called
-        console.log('All loans:', loans);
-        setLoans(loans);
-      } catch (error) {
-        console.error('Error fetching loans:', error);
-      }
-    };
-
-    fetchLoans();
-  }, [getAllLoans]); 
+    getAllLoans();
+  }, []); 
 
   const handleSearch = (value: string) => {
     setSearchValue(value); // Update the search query state
   };
 
-  const filteredData = loans?.filter((loan: LoanState) =>
-    loan.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-    loan.author.toLowerCase().includes(searchValue.toLowerCase()) ||
-    loan.isbn.toLowerCase().includes(searchValue.toLowerCase()) ||
-    loan.student.toLowerCase().includes(searchValue.toLowerCase()) ||
-    loan.librarian.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  const filteredData = loans; 
 
   const data: LoanState[] = loans?.map((loan, index) => {
     return {
@@ -122,6 +107,7 @@ const BorrowedBooksPage: React.FC = () => {
       isbn: loan.isbn,
       loanDate: loan.loanDate,
       returnDate: loan.returnDate,
+      image: loan.image,
     };
   });
 

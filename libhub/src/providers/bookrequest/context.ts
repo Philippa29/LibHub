@@ -8,11 +8,25 @@ export const initialState: BookRequestState = {
     title: '',
     author: '',
     isbn: '',
+    image: '',
+    
+}
+
+export interface IBookRequest {
+    bookRequest?: BookRequestState;
+    bookRequests?: BookRequestState[];
+    count?: number;
+}
+
+export const initialBookRequestState: IBookRequest = {
+    bookRequest: null,
+    bookRequests: [],
+    count: 0,
     
 }
 
 
-export const BookRequestStateContext = createContext<BookRequestState>(initialState);
+export const BookRequestStateContext = createContext<IBookRequest>(initialBookRequestState);
 export const BookRequestActionsContext = createContext<BookRequestAction>({
     getAllBookRequest: async () => [] as BookRequest[],
     addBookRequest: async () => {},

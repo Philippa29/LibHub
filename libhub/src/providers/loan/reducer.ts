@@ -1,55 +1,60 @@
 import { LoanState , Action , GetAllAction, LoanCount } from "./interface";
+import { handleActions } from 'redux-actions';
+import { ILoanContext, initialLoanState } from './context';
+import { ActionTypes } from './action';
 
 
-type Loans = LoanState[];
-const GetAllLoansReducer = (state: Loans, action: GetAllAction) => {
-    switch (action.type) {
-        case 'GET_ALL_LOAN':
+const LoansReducer = handleActions<ILoanContext, any>(
+    {
+        [ActionTypes.CREATE_LOAN]: (state, action) => {
             if (action.payload) {
-                console.log("action.payload for loan", action.payload)
-                const loans = action.payload.map((loan, index) => {
+                // Check if a loan for the same book already exists in the state
+                const existingLoan = state.loans.find(loan => loan.book=== action.payload.bookId);
+                
+                // If the loan for the same book doesn't already exist, append the new loan to the array
+                if (!existingLoan) {
                     return {
-                        ...loan,
-                        bookRequest: loan.bookRequest,
-                        book: loan.book,
-                        isReturned: loan.isReturned,
-                        isOverdue: loan.isOverdue,
+                        //...state,
+                        loans: [ action.payload], // Append the new loan to the existing array of loans
                     };
-                });
-                return [...loans];
+                }
             }
-            // Return the current state if the payload is falsy or not provided
             return state;
-        // Add a default case to return the current state if the action type is unknown
-        default:
-            return state;
-    }
-}
-
-const AddLoanReducer = (state: LoanState, action: Action) => {
-    switch (action.type) {
-        case 'ADD_LOAN':
+        },
+        
+        [ActionTypes.GET_LOANS]: (state, action) => {
+            console.log("STATE", state , "ACTION", action.payload);
             if (action.payload) {
+                //const loan = (state.loans || []).find(loan => loan.id === action.payload.id);
                 return {
-                    bookRequest: action.payload.bookRequest,
-                    book: action.payload.book,
-                    isReturned: action.payload.isReturned,
-                    isOverdue: action.payload.isOverdue,
+                    ...state,
+                    loans : action.payload // Set the selected loan to the found loan or null if no loan was found
                 };
             }
             return state;
-        default:
+        },
+        [ActionTypes.IS_RETURNED]: (state, action) => {
+            console.log("STATE", state , "ACTION", action.payload); 
+            if (action.payload) {
+                const updatedLoans = (state.loans || []).filter(loan => loan.id !== action.payload.id);
+                console.log("UPDATED LOANS", updatedLoans);
+                return {
+                    ...state,
+                    loans: updatedLoans, // Update the array of loans after filtering out the deleted one
+                };
+            }
             return state;
-    }
-}
-
-const LoanCountReducer = (state: number, action: LoanCount) => {
-    switch (action.type) {
-        case 'LOAN_COUNT':
-            return action.payload;
-        default:
+        },
+        [ActionTypes.LOAN_COUNT]: (state, action) => {
+            if (action.payload) {
+                return { ...state, count: action.payload }; // Set the count of loans
+            }
             return state;
-    }
-}
+        },
+    },
+    initialLoanState
+);
 
-export {GetAllLoansReducer, AddLoanReducer, LoanCountReducer}
+
+
+export {LoansReducer}

@@ -35,9 +35,9 @@ const NavBar: React.FC = () => {
   const {styles, cx} = dashStyles();
 
   const handleLogout = () => {
-    localStorage.removeItem('authtoken');
+    localStorage.removeItem('authToken');
     //localStorage.removeItem('user');
-    window.location.href = '/login';
+    window.location.href = '/';
   }
   
   return (

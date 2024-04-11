@@ -5,6 +5,7 @@ export const initialState: BookRequestState = {
     title: '', 
     author: '',
     isbn: '',
+    image: '',
 };
 
 export interface BookRequestState {
@@ -14,6 +15,7 @@ export interface BookRequestState {
     title: string,
     author: string,
     isbn: string,
+    image: string,
 }
 
 export interface BookRequestAction {

@@ -32,7 +32,7 @@ export interface Credentials {
   }
 
   export interface AuthActions {
-    login: (credentials: Credentials) => void;
+    login: (credentials: Credentials) => Promise<void>;
     logout: () => void;
     
   }

@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation';
 import { useUserActions } from '@/providers/users';
 import { Book } from '../../providers/book/interface';
 import { LoanState } from '../../providers/loan/interface';
+import { useBookRequestState } from '@/providers/bookrequest';
+import { useLoanState } from '@/providers/loan';
+import moment from 'moment';
+import { BookRequest } from '@/providers/bookrequest/interface';
 
 const { Header } = Layout;
 
@@ -24,22 +28,22 @@ const TopNavBar: React.FC = () => {
 
   // State to control visibility of user details modal and store book requests and loans
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [bookRequests, setBookRequests] = useState<Book[]>([]);
-  const [loans, setLoans] = useState<LoanState[]>([]);
-
+  const [userLoans, setUserLoans] = useState<LoanState[]>([]);
+  const [userBookRequests, setUserBookRequests] = useState<Book[]>([]);
+  const {bookRequests } = useBookRequestState();
+  const {loans} = useLoanState(); 
+  
   // Function to open modal and fetch book requests and loans
   const openModal = async () => {
     setIsModalVisible(true);
-    try {
-      const requests = await getUsersBookRequests();
+    
+      const request = await getUsersBookRequests();
       const userLoans = await getUsersLoan();
-      console.log('Requests:', requests);
-      console.log('Loans:', userLoans);
-      setBookRequests(requests);
-      setLoans(userLoans);
-    } catch (error) {
-      console.error('Error fetching user details:', error);
-    }
+      setUserLoans(userLoans);
+      setUserBookRequests(request);
+      console.log('Requests:', bookRequests);
+      console.log('Loans:', loans);
+   
   };
 
   // Function to close modal
@@ -85,24 +89,37 @@ const TopNavBar: React.FC = () => {
         onCancel={closeModal}
         footer={null}
       >
+      <div>
+  <h3>Book Requests</h3>
+  <List
+    dataSource={userBookRequests}
+    renderItem={(item) => (
+      <List.Item>
         <div>
-          <h3>Book Requests</h3>
-          <List
-            dataSource={bookRequests}
-            renderItem={(item) => (
-              <List.Item>{`Title: ${item.title}, ISBN: ${item.isbn}`}</List.Item>
-            )}
-          />
+          <div>{`Title: ${item.title}`}</div>
+          <div>{`ISBN: ${item.isbn}`}</div>
         </div>
+      </List.Item>
+    )}
+  />
+</div>
+<div>
+  <h3>Loans</h3>
+  {loans[0]?.title}
+  <List
+    dataSource={userLoans}
+    renderItem={(item) => (
+      <List.Item>
         <div>
-          <h3>Loans</h3>
-          <List
-            dataSource={loans}
-            renderItem={(item) => (
-              <List.Item>{`Title: ${item.title}, ISBN: ${item.isbn}, Return Date: ${item.returnDate}`}</List.Item>
-            )}
-          />
+          <div>{`Title: ${item.title}`}</div>
+          <div>{`ISBN: ${item.isbn}`}</div>
+          <div>{`Return Date: ${moment(item.returnDate).format('MMMM Do YYYY, h:mm:ss a')}`}</div>
         </div>
+      </List.Item>
+    )}
+  />
+</div>
+
       </Modal>
     </Header>
   );

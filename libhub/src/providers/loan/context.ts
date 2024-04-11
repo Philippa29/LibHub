@@ -1,10 +1,19 @@
 import {createContext} from 'react'; 
 import {LoanState , initialState} from './interface';
-import { isReturned } from './action';
 
 
+export interface ILoanContext{
+    loan?: LoanState;
+    loans?: LoanState[];
+}
 
-export const LoanStateContext = createContext<LoanState>(initialState);
+export const initialLoanState: ILoanContext = {
+    loan: null,
+    loans: [],
+}
+
+
+export const LoanStateContext = createContext<ILoanContext>(initialLoanState);
 export const LoanActionsContext = createContext({
     getAllLoans: async () => [] as LoanState[],
     getLoan: async (id: string) => initialState,
