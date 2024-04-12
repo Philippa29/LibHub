@@ -11,6 +11,7 @@ export const initialState: LoanState = {
     author: '',
     isbn: '',
     student: '',
+    image: '',
     librarian: '',
 }; 
 
@@ -27,6 +28,7 @@ export interface LoanState {
     author: string,
     isbn: string,
     student: string,
+    image: string,
     librarian: string,
 }
 

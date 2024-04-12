@@ -1,55 +1,68 @@
-import { Action , BookState, CategoryAction, CategoryState, DeleteAction, GetAllAction, getBookbyidstate , GetImageAction, ImageState , allimagesAction} from "./interface";
+import { Action, BookActions  } from "./interface";
+import { IBookContext, initialState } from "./context";
+import { handleActions } from "redux-actions";
+import { ActionTypes } from "./action";
 
-type Books = BookState[];
+
+export const bookReducer = handleActions<IBookContext, any>(
+  {
+    [ActionTypes.CREATE_BOOK]: (state, action) => {
+      if (action.payload) {
+        return {
+          ...state,
+          books: [...state.books, action.payload], // Append the new book to the existing array of books
+        };
+      }
+      return state;
+    },
+    [ActionTypes.UPDATE_BOOK]: (state, action) => {
+      if (action.payload) {
+        // change the book with the same id as the updated book
+        const updatedBooks = state.books.map(book =>
+          book.bookId === action.payload.bookId ? action.payload : book
+        );
+        return {
+          ...state,
+          books: updatedBooks, // Update the array of books with the updated one
+        };        
+      }
+      return state;
+    },
+    [ActionTypes.GET_BOOK]: (state, action) => {
+      if (action.payload) {
+        const book = state.books.find(book => book.bookId === action.payload.id);
+        return {
+          ...state,
+          selectedBook: book || null, // Set the selected book to the found book or null if no book was found
+        };
+      }
+      return state;
+    },
+    [ActionTypes.DELETE_BOOK]: (state, action) => {
+      if (action.payload) {
+        console.log("action", action.payload)
+        const books = state.books.filter(book => book.bookId !== action.payload);
+        return {
+          ...state,
+          books: books, // Set the selected book to the found book or null if no book was found
+        };
+      }
+      return state;
+    },
+
+    [ActionTypes.GET_ALL_BOOKS]: (state, action) => {
+      if (action.payload) {
+        return { ...state, books: action.payload }; // Replace the existing books with the new array of books
+      }
+      return state;
+    },
+    // Add more action handlers here as needed
+  },
+  initialState // This is the initial state
+);
   
-const addbookreducer = (state: BookState , action: Action ) => {
-    //console.log("action", action);
-    //console.log("state", state);
-    switch (action.type) {
-      case 'ADD_BOOK':
-        if (action.payload) {
-            return {
-                ...state,
-              title: action.payload.title,
-              isbn: action.payload.isbn,
-              author: action.payload.author,
-              publisher: action.payload.publisher,
-              categoryID: action.payload.categoryID,
-              bookStatus: action.payload.bookStatus,
-              bookCondition: action.payload.bookCondition,
-              file: action.payload.file,
-
-            };
-        }
-
-        case 'GET_BOOK_BY_ID':
-          if (action.payload) {
-              return {
-                  ...state,
-                id: action.payload.id,
-                title: action.payload.title,
-                isbn: action.payload.isbn,
-              }; 
-          }
-      
 
 
-
-
-
-    
-
-    
-
-        default:
-        return state;
-    }
-
-};
-
-interface SearchState {
-  books: BookState[];
-}
 
 const getBookByIdInitialState: GetBookByIdState = {
   author: '',
@@ -57,76 +70,7 @@ const getBookByIdInitialState: GetBookByIdState = {
   isbn: '',
 };
 
-const getBookByIdReducer = (state: getBookbyidstate[], action: GetBookByIdAction) => {
-  switch (action.type) {
-    case 'GET_BOOK_BY_ID':
-      // Add the new book detail to the state array
-      return [
-        ...state,
-        {
-          id: action.payload.id,
-          author: action.payload.author,
-          title: action.payload.title,
-          isbn: action.payload.isbn,
-          // Include other properties as needed
-        }
-      ];
-    default:
-      return state;
-  }
-};
 
-const getallImagesReducer = (state: ImageState[], action: allimagesAction) => {
-  switch (action.type) {
-    case 'GET_ALL_IMAGES':
-      return [
-        ...state,
-        {
-          id: action.payload.id,
-          fileName: action.payload.fileName,
-          fileType: action.payload.fileType,
-          filePath: action.payload.base64,
-        }
-        
-      ];
-    default:
-      return state;
-  }
-}
-
-const searchReducer = (state: Books, action: GetAllAction)=> {
-  switch (action.type) {
-    case 'SEARCH_AUTHOR':
-      const booksByAuthor = action.payload.map((book, index) => {
-        return {
-          ...book,
-          BookId: book.bookId // Assigning 'bookId' to the 'id' property
-        };
-      });
-      return { ...state, books: booksByAuthor };
-
-    case 'SEARCH_TITLE':
-      const booksByTitle = action.payload.map((book, index) => {
-        return {
-          ...book,
-          BookId: book.bookId // Assigning 'bookId' to the 'id' property
-        };
-      });
-      return { ...state, books: booksByTitle };
-
-    case 'SEARCH_ISBN':
-      const booksByISBN = action.payload.map((book, index) => {
-        return {
-          ...book,
-          BookId: book.bookId // Assigning 'bookId' to the 'id' property
-        };
-      });
-      return { ...state, books: booksByISBN };
-
-    default:
-      return state;
-  }
-};
 
 
 
@@ -146,93 +90,5 @@ export interface GetBookByIdAction {
   };
 }
 
-const getImageReducer = (state: string, action: GetImageAction) => {
-  switch (action.type) {
-    case 'GET_IMAGE':
-      return action.payload;
-    default:
-      return state;
-  }
-};
-
-const updateImageReducer = (state: string, action: GetImageAction) => {
-  switch (action.type) {
-    case 'UPDATE_IMAGE':
-      return action.payload;
-    default:
-      return state;
-  }
-};
 
 
-
-const deleteBookreducer = (state: BookState , action: DeleteAction) => {
-    switch (action.type) {
-      case 'DELETE_BOOK':
-        if (action.payload) {
-            return {
-                ...state,
-              id: action.payload.id,
-            };
-        }
-        console.log("state in getBook", state);
-        return state;
-    
-
-        default:
-        return state;
-    }
-} 
-
-const getallbooksreducer = (state: Books, action: GetAllAction) => {
-  switch (action.type) {
-      case 'GET_ALL_BOOKS':
-          if (action.payload) {
-              const booksWithId = action.payload.map((book, index) => {
-                  return {
-                      ...book,
-                      BookId: book.bookId // Assigning 'bookId' to the 'id' property
-                  };
-              });
-              return [...booksWithId];
-          }
-          return state;
-    
-      default:
-          return state;
-  }
-}
-
-
-
-
-const categoryreducer = (state: CategoryState , action: CategoryAction) => {
-
-    switch (action.type) {
-      case 'GET_CATEGORY':
-        if (action.payload) {
-            return {
-                ...state,
-              id: action.payload.id,
-              name: action.payload.name,
-            };
-        }
-        console.log("state in getBook", state);
-        return state;
-
-      case 'ADD_CATEGORY':
-        if (action.payload) {
-            return {
-                ...state,
-              id: action.payload.id,
-              name: action.payload.name,
-            };
-        }
-    
-
-        default:
-        return state;
-    }
-} 
-
-export {addbookreducer , categoryreducer, getallbooksreducer, deleteBookreducer,getBookByIdReducer,getImageReducer,updateImageReducer, searchReducer, getallImagesReducer, getBookByIdInitialState};

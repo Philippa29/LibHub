@@ -1,10 +1,16 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useReducer, useState } from 'react';
 import axios from 'axios';
-import { LoanActionsContext , LoanStateContext  } from './context';
+import { LoanActionsContext , LoanStateContext, ILoanContext, initialLoanState  } from './context';
 import { LoanState , initialState } from './interface';
-
+import { LoansReducer } from './reducer';
+import { create } from 'domain';
+import { createLoanAction , getLoansAction , isReturnedAction} from './action';
+import { updateBookRequestAction } from '../bookrequest/action';
+import { BookRequestReducer } from '../bookrequest/reducer';
+import { initialBookRequestState } from '../bookrequest/context';
+import { message } from 'antd';
 interface LoanProps {
     children: React.ReactNode;
 }
@@ -12,14 +18,15 @@ interface LoanProps {
 
 
 const LoanProvider: React.FC<LoanProps> = ({ children }) => {
-    const [state, setState] = useState(initialState);
-
+    const [state, dispatch] = useReducer(LoansReducer, initialLoanState);
+    const [stateBookRequest, dispatchBookRequest] = useReducer(BookRequestReducer, initialBookRequestState);
+    
     const getAllLoans = async () => {
         console.log("inside get all loans");
         try {
             const response = await axios.get('https://localhost:44311/api/services/app/Loan/GetAllLoans', {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                     'Content-Type': 'application/json',
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache',
@@ -27,6 +34,7 @@ const LoanProvider: React.FC<LoanProps> = ({ children }) => {
                 }
             });
             console.log("reponse in the provider: ", response);
+            dispatch(getLoansAction (response.data.result));
             return response.data.result;
         } catch (error) {
             console.error('Error fetching loans:', error);
@@ -37,13 +45,14 @@ const LoanProvider: React.FC<LoanProps> = ({ children }) => {
     const createLoan = async (loan: LoanState) => {
         console.log("inside create loan");
         console.log("loan in the provider: ", loan);
-
+        console.log("authToken in the provider: ", localStorage.getItem('authToken')    );
+  const createLoanData = { bookRequest: loan.bookRequest, book: loan.book };
        // console.log(localStorage.getItem('authToken'));
+   
+      
+        console.log("createLoanData in the provider: ", createLoanData.bookRequest);
     
-        const createLoanData = { bookRequest: loan.bookRequest, book: loan.book };
-        console.log("createLoanData in the provider: ", createLoanData);
-    
-        try {
+       
             const response = await axios.post('https://localhost:44311/api/services/app/Loan/CreateLoan', createLoanData, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -54,10 +63,12 @@ const LoanProvider: React.FC<LoanProps> = ({ children }) => {
                 }
             });
             console.log("response in the provider: ", response);
+
+                    dispatchBookRequest(updateBookRequestAction(createLoanData.bookRequest));
+                    dispatch(createLoanAction(response.data.result));
             return response.data.result;
-        } catch (error) {
-            console.error('Error creating loan:', error);
-        }
+      
+        
     };
     
     
@@ -98,8 +109,9 @@ const LoanProvider: React.FC<LoanProps> = ({ children }) => {
                     'Expires': '0',
                 }
             });
-            
+            dispatch(isReturnedAction(response.data.result));
             console.log("response in the provider: ", response);
+            message.success('Book returned successfully');
             return response.data.result;
         } catch (error) {
             console.error('Error checking if loan is returned:', error);

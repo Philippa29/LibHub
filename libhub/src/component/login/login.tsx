@@ -48,9 +48,10 @@ const Login = () => {
 
   const onFinish = async () => {
     console.log('credentials: ', credentials);
+
     try {
-      
       await login(credentials);
+      console.log("trying...")
       authToken = localStorage.getItem('authToken');
       console.log('authToken', authToken);
       if (authToken) {
@@ -74,15 +75,12 @@ const Login = () => {
    
   };
 
-
-
   const validateUsername = (rule: any, value: string) => {
     if (!value || (value.trim().length === 9 && ['s', 'u'].includes(value.trim().charAt(0).toLowerCase()))) {
       return Promise.resolve();
     }
     return Promise.reject('Username must start with "s" or "u"');
   };
-
 
   return (
     <div className={styles.body}>
@@ -138,8 +136,7 @@ const Login = () => {
           <Form.Item>
             <Button type="primary" htmlType="submit" className={styles.loginFormButton}>Sign in</Button>
           </Form.Item>
-        
-          
+                  
           </Form>
           <span style={{ cursor: 'pointer', color: 'blue' }} onClick={handleOpenRegistrationModal}>
           Register
@@ -147,9 +144,6 @@ const Login = () => {
 
           <Register onClose={handleCloseRegistrationModal} open={isModalVisible} />
 
-   
-       
-      
       </div>
     </div>
     

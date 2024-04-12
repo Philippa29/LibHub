@@ -15,10 +15,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const {push} = useRouter();
 
+  // 7561
 
   const login = async (credentials: Credentials) => {
     console.log("here"); 
-    try {
+  
+    
       console.log("here inside ", credentials); 
       const response = await axios.post(`${process.env["NEXT_PUBLIC_AUTH_URL"]}`, credentials, {
         headers: {
@@ -29,28 +31,14 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.status === 200) { // Fixed conditional statement
         console.log(response.data.result.accessToken);
         dispatch({ type: 'LOGIN', payload: response.data.result.accessToken });
-        console.log('state:', state.authToken);
+       // console.log('state:', state.authToken);
         localStorage.setItem('authToken', response.data.result.accessToken);
+        dispatch({ type: 'LOGIN', payload: response.data.result.accessToken });
         
-        
-      } else {
-        throw new Error('Network response was not ok');
-      }
+      } 
 
-      //const result = await response.json();
-
-
-             if (!response.data.ok) {
-        throw new Error('Network response was not ok')
-      }
-    } 
-    catch (err) {
-      
-      if ((err as any).response && (err as any).response.status === 500) {
-        // Internal server error occurred
-        message.error('Internal server error. Please try again later.');
-      }
-    }
+    
+    
 
    
   };

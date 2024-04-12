@@ -1,7 +1,7 @@
 import { createAction } from "redux-actions";
+import { IBookRequest } from "./context";
 
-
-enum ActionTypes{
+export enum ActionTypes{
     CREATE_BOOKREQUEST = 'CREATE_BOOKREQUEST',
     DELETE_BOOKREQUEST = 'DELETE_BOOKREQUEST',
     UPDATE_BOOKREQUEST = 'UPDATE_BOOKREQUEST',
@@ -10,6 +10,7 @@ enum ActionTypes{
 }
 
 
-export const createBookRequest = createAction(ActionTypes.CREATE_BOOKREQUEST);
-export const getBookRequest = createAction(ActionTypes.GET_BOOKREQUEST);
-export const updateBookRequest = createAction(ActionTypes.UPDATE_BOOKREQUEST);
+export const createBookRequestAction= createAction<IBookRequest, IBookRequest>(ActionTypes.CREATE_BOOKREQUEST, p => p);
+export const getBookRequestAction = createAction<IBookRequest, IBookRequest>(ActionTypes.GET_BOOKREQUEST, p => p);
+export const updateBookRequestAction = createAction<string>(ActionTypes.UPDATE_BOOKREQUEST);
+

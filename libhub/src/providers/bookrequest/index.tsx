@@ -1,20 +1,26 @@
 'use client'
 import React, { useContext, useReducer } from 'react';
 import axios from 'axios';
-import { BookRequestActionsContext, BookRequestStateContext, initialState } from './context';
-import { AddBookRequestReducer, GetAllBookRequestReducer } from './reducer';
+import { BookRequestActionsContext, BookRequestStateContext, initialBookRequestState } from './context';
+import { BookRequestReducer } from './reducer';
+import { getBookRequestAction, createBookRequestAction } from './action';
+import { bookReducer } from '../book/reducer';
+import { initialState } from '../book/context';
+import { updateBookAction } from '../book/action';
 
 interface BookRequestProps {
   children: React.ReactNode;
 }
 
 const BookRequestProvider: React.FC<BookRequestProps> = ({ children }) => {
-    const [state, dispatch] = useReducer(AddBookRequestReducer, initialState);
-    
+    const [state, dispatch] = useReducer(BookRequestReducer, initialBookRequestState);
+    const [statebook, dispatchbook] = useReducer(bookReducer, initialState);
     const getAllBookRequest = async () => {
         try {
             const response = await axios.get('https://localhost:44311/api/services/app/BookRequest/GetAllBookRequests');
-            //console.log("reponse in the provider: " , response);
+            console.log("response in the provider for bookrequest: ", response.data.result);
+            dispatch(getBookRequestAction(response.data.result)); 
+            
             return response.data.result;
         } catch (error) {
             console.error('Error fetching book requests:', error);
@@ -23,6 +29,7 @@ const BookRequestProvider: React.FC<BookRequestProps> = ({ children }) => {
 
     const addBookRequest = async (bookRequest: any) => {
         console.log("inside add book request");
+        console.log("bookRequest in the provider: ", state);
             console.log("bookRequest in the provider: ", bookRequest);
         try {
             
@@ -36,6 +43,8 @@ const BookRequestProvider: React.FC<BookRequestProps> = ({ children }) => {
                 }
             });
             console.log("reponse in the provider: " , response);
+            dispatch(createBookRequestAction(response.data.result));
+            dispatchbook(updateBookAction(bookRequest.bookId));
             return response.data.result;
         } catch (error) {
             console.error('Error adding book request:', error);
@@ -45,6 +54,7 @@ const BookRequestProvider: React.FC<BookRequestProps> = ({ children }) => {
     const countBookRequest = async () => {
         try {
             const response = await axios.get('https://localhost:44311/api/services/app/BookRequest/GetBookRequestCount');
+
             return response.data.result;
         } catch (error) {
             console.error('Error fetching book request count:', error);
