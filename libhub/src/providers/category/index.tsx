@@ -37,7 +37,8 @@ const CategoryProvider : React.FC<CategoryProviderProps> = ({children}) => {
     
     const addCategory = async (category: string): Promise<void> => {
     try {
-        const response = await axios.post('https://localhost:44311/api/services/app/Category/CreateCategory', { name: category });
+        console.log("Category", category)
+        const response = await axios.post('https://localhost:44311/api/services/app/Category/CreateCategory', category);
         
         dispatch(createCategoryAction(response.data));
         if (response.data.success) {

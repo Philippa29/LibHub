@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect, useReducer, Suspense } from 'react';
 import { Input, Table, Space, Modal, Form, Button, Upload, Select, Card, Image } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined , EyeOutlined, FileSyncOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined, PlusOutlined, UploadOutlined , EyeOutlined, FileSyncOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons';
 import { useBookActions, useBookState } from '@/providers/book';
 import { useCategoryActions, useCategoryState } from '@/providers/category';
 import { message } from 'antd';
@@ -302,15 +302,14 @@ const ViewModal = (
       ),
     },
     
-    { 
+    {
       title: 'Edit',
       key: 'actions',
       render: (text: any, record: Book) => (
         <Space size="middle">
-          <Button onClick={() => handleEdit(record)}>Edit</Button>
+          <Button onClick={() => handleEdit(record)} icon={<EditOutlined />}></Button>
         </Space>
       ),
-
     },
     {
       title: 'Actions',
@@ -318,7 +317,7 @@ const ViewModal = (
       render: (text: any, record: Book) => (
         <Space size="middle">
           {renderViewButton(record)}
-          
+          {/* Assuming renderViewButton renders a button with appropriate icon */}
         </Space>
       ),
     },
@@ -327,7 +326,7 @@ const ViewModal = (
       key: 'delete',
       render: (text: any, record: Book) => (
         <Space size="middle">
-          <Button danger onClick={() => showDeleteModal(record)}>Delete</Button>
+          <Button danger onClick={() => showDeleteModal(record)} icon={<DeleteOutlined />}></Button>
         </Space>
       ),
     },
